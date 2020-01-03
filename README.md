@@ -11,7 +11,7 @@ Docker image for FutuOpenD on Ubuntu
 - **FUTU_LOGIN_ACCOUNT** required
 - **FUTU_LOGIN_PWD_MD5** required
 - **FUTU_LOGIN_REGION** defaults to `sh`
-- **ENV FUTU_LANG** defaults to `chs`
+- **FUTU_LANG** defaults to `chs`
 - **FUTU_LOG_LEVEL** defaults to `no`
 
 ## How to build your own image
