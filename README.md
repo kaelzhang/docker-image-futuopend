@@ -1,0 +1,35 @@
+# kaelz/futuopend
+
+Docker image for FutuOpenD on Ubuntu
+
+## Versions
+
+- **2.8.700**
+
+## Environment variables
+
+- **FUTU_LOGIN_ACCOUNT** required
+- **FUTU_LOGIN_PWD_MD5** required
+- **FUTU_LOGIN_REGION** defaults to `sh`
+- **ENV FUTU_LANG** defaults to `chs`
+- **FUTU_LOG_LEVEL** defaults to `no`
+
+## How to build your own image
+
+```sh
+docker build -t $TAG:$VERSION --build-arg VERSION=$VERSION .
+```
+
+For example:
+
+```sh
+docker built -t kaelz/futuopend:2.8.700 --build-arg VERSION=2.8.700_Ubuntu16.04 .
+```
+
+## How to start the container
+
+```sh
+docker run -it -p 80:11111 \
+-e "FUTU_LOGIN_ACCOUNT=$your_futu_id" \
+-e "FUTU_LOGIN_PWD_MD5=$your_password_md5" kaelz/futuopend:$image_version
+```
