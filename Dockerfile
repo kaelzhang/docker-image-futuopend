@@ -29,16 +29,8 @@ COPY entrypoint.sh .
 
 RUN chmod +x entrypoint.sh
 
-# RUN ls -aLF
-
-# COPY FutuOpenD_${VERSION}/FutuOpenD ./bin
-# COPY FutuOpenD_${VERSION}/FTWebSocket ./bin
-
-# # ENV PATH="/usr/src/app/bin:${PATH}"
-
 ENV FUTU_LOGIN_ACCOUNT=
 ENV FUTU_LOGIN_PWD_MD5=
-# ENV FUTU_LOGIN_PWD=
 ENV FUTU_LOGIN_REGION=sh
 ENV FUTU_LANG=chs
 ENV FUTU_LOG_LEVEL=no
