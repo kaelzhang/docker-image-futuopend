@@ -2,6 +2,10 @@
 
 Docker image for FutuOpenD on Ubuntu
 
+```sh
+docker pull kaelz/futuopend:2.8.700
+```
+
 ## Image Versions
 
 - **2.8.700**
