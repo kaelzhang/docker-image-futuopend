@@ -40,3 +40,10 @@ docker run -it -p 11111:11111 \
 -e "FUTU_LOGIN_ACCOUNT=$your_futu_id" \
 -e "FUTU_LOGIN_PWD_MD5=$your_password_md5" kaelz/futuopend:$image_version
 ```
+
+### For Mac
+
+It is not easy to connect to a container from MacOS, to run `test.py` from MacOS, see:
+
+- https://docs.docker.com/docker-for-mac/networking/#known-limitations-use-cases-and-workarounds
+- https://github.com/docker/for-mac/issues/2670#issuecomment-372365274
