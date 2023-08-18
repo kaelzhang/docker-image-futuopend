@@ -17,6 +17,9 @@
 *.db
 nohup.out
 
+# node
+package-lock.json
+
 # OS or Editor folders
 .DS_Store
 ._*
@@ -40,6 +43,7 @@ old/
 *-old/
 *-notrack/
 no-track/
+*.no_track.*
 build/
 combo/
 reference/

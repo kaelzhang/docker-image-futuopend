@@ -35,17 +35,18 @@ RUN chmod +x ./bin/FutuOpenD
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm i --only=production
 
 # COPY ./src .
-COPY start.js .
+COPY . .
 
 ENV FUTU_LOGIN_ACCOUNT=
 ENV FUTU_LOGIN_PWD_MD5=
 ENV FUTU_LOGIN_REGION=sh
-ENV FUTU_LANG=chs
+ENV FUTU_LANG=en
 ENV FUTU_LOG_LEVEL=no
 ENV FUTU_PORT=11111
 ENV SERVER_PORT=8000
+ENV FUTU_CMD=/usr/src/app/bin/FutuOpenD
 
 CMD [ "node", "/usr/src/app/start.js" ]

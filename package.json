@@ -1,4 +1,8 @@
 {
   "private": true,
-  "version": "2.8.700"
+  "version": "1.0.0",
+  "dependencies": {
+    "@ostai/env": "^1.1.0",
+    "ws": "^8.13.0"
+  }
 }
