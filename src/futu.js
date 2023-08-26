@@ -1,5 +1,7 @@
 const {spawn} = require('child_process')
 
+const {WebSocketServer} = require('ws')
+
 const STATUS = {
   INIT: 0,
   REQUESTING_VERIFY_CODE: 1,
@@ -13,9 +15,14 @@ module.exports = class FutuManager {
     login_region,
     lang,
     log_level,
-    api_port
+    api_port,
+    server_port
   }) {
+    console.log('futu manager arguments', arguments)
     this._status = STATUS.INIT
+
+    this._ws = new WebSocketServer({port: server_port})
+
     this._child = spawn(cmd, [
       '-login_account', login_account,
       '-login_pwd_md5', login_pwd_md5,
@@ -26,8 +33,12 @@ module.exports = class FutuManager {
     ])
 
     this._child.stdout.on('data', data => {
-      console.log('data', typeof(data), data)
+      console.log('+++ data', typeof(data), data, data.toString())
     })
+
+    this._child.stderr.on('data', (data) => {
+      console.error('+++ error', data, data.toString());
+    });
 
     this._ready = new Promise((resolve, reject) => {
       this._resolve = resolve
