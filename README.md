@@ -18,7 +18,7 @@ docker pull kaelz/futuopend:latest
 - **FUTU_LANG** defaults to `chs`
 - **FUTU_LOG_LEVEL** defaults to `no`
 - **FUTU_PORT** defaults to `11111`
-- **SERVER_PORT** `integer` the port of the websocket server
+- **SERVER_PORT** `integer` the port of the websocket server, defaults to `8000`
 
 ## How to start the container
 
@@ -26,6 +26,33 @@ docker pull kaelz/futuopend:latest
 docker run -it -p 11111:11111 \
 -e "FUTU_LOGIN_ACCOUNT=$your_futu_id" \
 -e "FUTU_LOGIN_PWD_MD5=$your_password_md5" kaelz/futuopend:latest
+```
+
+## WebSocket Server
+
+### Incoming Message
+
+- **type** `string` the type of the messages, including following types:
+  - REQUEST_VERIFY_CODE: which means the FutuOpenD agent requires you to provide an SMS verification code
+  - CONNECTED: which means the FutuOpenD agent is connected
+
+```js
+6const {WebSocket} = require('ws')
+
+const ws = new WebSocket('ws://localhost:8080')
+
+ws.on('open', () => {
+  ws.on('message', msg => {
+    const data = JSON.parse(msg)
+
+    if (data.type === 'REQUEST_VERIFY_CODE') {
+      ws.send(JSON.stringify({
+        type: 'VERIFY_CODE',
+        code: '12345'
+      }))
+    }
+  })
+})
 ```
 
 ### For Mac
