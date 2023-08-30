@@ -41,7 +41,7 @@ docker run -it -p 11111:11111 \
   - CONNECTED: which means the FutuOpenD agent is connected
 
 ```js
-6const {WebSocket} = require('ws')
+const {WebSocket} = require('ws')
 
 const ws = new WebSocket('ws://localhost:8080')
 
