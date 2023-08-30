@@ -5,7 +5,8 @@ const {WebSocketServer} = require('ws')
 const STATUS = {
   INIT: 0,
   REQUESTING_VERIFY_CODE: 1,
-  CONNECTED: 2
+  VERIFIYING_CODE: 2,
+  CONNECTED: 3
 }
 
 module.exports = class FutuManager {
@@ -30,6 +31,18 @@ module.exports = class FutuManager {
     this._clients = []
 
     this._ws.on('connection', ws => {
+      if (this._status === STATUS.REQUESTING_VERIFY_CODE) {
+        this._send({
+          type: 'REQUEST_VERIFY_CODE'
+        }, [ws])
+      }
+
+      if (this._status === STATUS.CONNECTED) {
+        this._send({
+          type: 'CONNECTED'
+        }, [ws])
+      }
+
       this._clients.push(ws)
       ws.on('error', err => console.error)
       ws.on('message', msg => {
@@ -55,19 +68,31 @@ module.exports = class FutuManager {
       `-lang=${this._lang}`,
       `-log_level=${this._log_level}`,
       `-api_port=${this._api_port}`
-    ], {
-      // stdio: ['ignore', 'ignore', 'ignore']
-    })
+    ])
 
     this._child.stdout.on('data', data => {
-      console.log('[FutuOpenD] stdout:', data.toString())
+      console.log(
+        '[FutuOpenD] stdout:',
+        // Remove redundant new empty lines
+        data.toString().replace(/(?:\s*(?:\r|\n)+)+/, '\n')
+      )
 
-      if (data.toString().includes('req_phone_verify_code')) {
+      const chunk = data.toString()
+
+      if (chunk.includes('req_phone_verify_code')) {
         this._send({
           type: 'REQUEST_VERIFY_CODE'
         })
         this._status = STATUS.REQUESTING_VERIFY_CODE
         this._resolve()
+        return
+      }
+
+      if (chunk.includes('Login successful')) {
+        this._send({
+          type: 'CONNECTED'
+        })
+        this._status = STATUS.CONNECTED
         return
       }
     })
@@ -81,8 +106,8 @@ module.exports = class FutuManager {
     })
   }
 
-  _send (msg) {
-    this._clients.forEach(client => {
+  _send (msg, clients) {
+    (clients || this._clients).forEach(client => {
       client.send(JSON.stringify(msg))
     })
   }
@@ -100,18 +125,13 @@ module.exports = class FutuManager {
         this._set_verify_code(code)
       })
     }
+
+    // avoid verifying code in other status
   }
 
   _set_verify_code (code) {
+    this._status = STATUS.VERIFIYING_CODE
     this._child.stdin.write(`input_phone_verify_code -code=${code}\n`)
     this._child.stdin.end()
   }
-
-  // get is_ready () {
-  //   return this._status === STATUS.CONNECTED
-  // }
-
-  // async ready () {
-  //   return this._ready
-  // }
 }
