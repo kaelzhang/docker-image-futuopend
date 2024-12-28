@@ -1,15 +1,17 @@
 # https://softwaredownload.futunn.com/Futu_OpenD_8.8.4818_Ubuntu16.04.tar.gz
 
-FROM ubuntu:20.04
+FROM ubuntu:16.04
 
 WORKDIR /usr/src/app
 
-RUN apt-get update && apt-get install -y curl gnupg apt-utils \
-  && curl -sL https://deb.nodesource.com/setup_20.x | bash - \
-  && apt-get install -y nodejs \
-  && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+&& apt-get install -y curl wget \
+# We have to use node 16.x for ubuntu 16.04 which is required by FutuOpenD
+&& curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+&& apt-get install -y nodejs \
+&& rm -rf /var/lib/apt/lists/*
 
-ARG VERSION=8.8.4818_Ubuntu16.04
+ARG FUTU_VERSION=8.8.4818_Ubuntu16.04
 
 # AppData.dat
 # FTWebSocket
@@ -17,18 +19,25 @@ ARG VERSION=8.8.4818_Ubuntu16.04
 # FutuOpenD.xml
 # libFTAPIChannel.so
 
-RUN wget -O Futu_OpenD.tar.gz https://softwaredownload.futunn.com/Futu_OpenD_$VERSION.tar.gz \
-&& tar -xf FutuOpenD.tar.gz && mkdir bin \
-&& mv ./Futu_OpenD_${VERSION}/AppData.dat ./bin \
-&& mv ./Futu_OpenD_${VERSION}/FTWebSocket ./bin \
-&& mv ./Futu_OpenD_${VERSION}/FutuOpenD ./bin \
-&& mv ./Futu_OpenD_${VERSION}/FutuOpenD.xml ./bin \
-&& mv ./Futu_OpenD_${VERSION}/libFTAPIChannel.so ./bin \
+RUN wget -O Futu_OpenD.tar.gz https://softwaredownload.futunn.com/Futu_OpenD_$FUTU_VERSION.tar.gz \
+&& tar -xf Futu_OpenD.tar.gz --strip-components=1 \
+&& mkdir bin \
+&& mv ./Futu_OpenD_${FUTU_VERSION}/AppData.dat ./bin \
+&& mv ./Futu_OpenD_${FUTU_VERSION}/FTWebSocket ./bin \
+&& mv ./Futu_OpenD_${FUTU_VERSION}/FutuOpenD ./bin \
+&& mv ./Futu_OpenD_${FUTU_VERSION}/FutuOpenD.xml ./bin \
+&& mv ./Futu_OpenD_${FUTU_VERSION}/libFTAPIChannel.so ./bin \
+&& mv ./Futu_OpenD_${FUTU_VERSION}/libf3cbasis.so ./bin \
+&& mv ./Futu_OpenD_${FUTU_VERSION}/libf3clog.so ./bin \
+&& mv ./Futu_OpenD_${FUTU_VERSION}/libf3clogin.so ./bin \
+&& mv ./Futu_OpenD_${FUTU_VERSION}/libf3cloguploader.so ./bin \
+&& mv ./Futu_OpenD_${FUTU_VERSION}/libf3creport.so ./bin \
 && rm -rf Futu_OpenD* \
 && chmod +x bin/FutuOpenD \
 && ls
 
-RUN chmod +x ./bin/FutuOpenD
+# COPY ./bin ./bin
+# RUN chmod +x ./bin/FutuOpenD
 
 COPY package*.json ./
 

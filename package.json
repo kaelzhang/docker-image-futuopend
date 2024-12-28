@@ -6,6 +6,6 @@
     "ws": "^8.13.0"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node start.js"
   }
 }

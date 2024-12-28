@@ -1,3 +1,5 @@
+/bin
+
 # Numerous always-ignore extensions
 *.bak
 *.patch

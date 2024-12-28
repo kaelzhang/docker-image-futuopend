@@ -72,11 +72,18 @@ It is not easy to connect to a container from MacOS, to run `test.py` from MacOS
 ## How to build your own image
 
 ```sh
-docker build -t $TAG:$VERSION --build-arg .
+VERSION=8.8.4818
+FUTU_VERSION="$VERSION"_Ubuntu16.04
+
+docker build -t $TAG:$VERSION \
+  --build-arg FUTU_VERSION=$FUTU_VERSION \
+  .
 ```
 
 For example:
 
 ```sh
-docker build -t kaelz/futuopend:2.8.700 .
+docker build -t kaelz/futuopend:8.8.4818 \
+  --build-arg FUTU_VERSION=8.8.4818_Ubuntu16.04 \
+  .
 ```
