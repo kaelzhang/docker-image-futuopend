@@ -4,5 +4,8 @@
   "dependencies": {
     "@ostai/env": "^1.1.0",
     "ws": "^8.13.0"
+  },
+  "scripts": {
+    "start": "node index.js"
   }
 }

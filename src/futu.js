@@ -98,7 +98,7 @@ module.exports = class FutuManager {
     })
 
     this._child.stderr.on('data', (data) => {
-      console.error('[FutuOpenD] process error:', data.toString())
+      console.error('[FutuOpenD] process error:' data.toString())
     })
 
     this._ready = new Promise((resolve, reject) => {
