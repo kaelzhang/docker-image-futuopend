@@ -12,7 +12,7 @@ docker pull kaelz/futuopend:latest
 
 ## Current FutuOpenD Image Version
 
-7.3.3508_Ubuntu16.04
+8.8.4818_Ubuntu16.04
 
 ## Environment Variables
 
@@ -37,7 +37,7 @@ docker run -it -p 11111:11111 \
 ### Incoming Message
 
 - **type** `string` the type of the messages, including following types:
-  - REQUEST_VERIFY_CODE: which means the FutuOpenD agent requires you to provide an SMS verification code
+  - REQUEST_CODE: which means the FutuOpenD agent requires you to provide an SMS verification code
   - CONNECTED: which means the FutuOpenD agent is connected
 
 ```js
@@ -49,7 +49,7 @@ ws.on('open', () => {
   ws.on('message', msg => {
     const data = JSON.parse(msg)
 
-    if (data.type === 'REQUEST_VERIFY_CODE') {
+    if (data.type === 'REQUEST_CODE') {
       ws.send(JSON.stringify({
         type: 'VERIFY_CODE',
         code: '12345'

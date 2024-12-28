@@ -4,7 +4,7 @@ const {WebSocketServer} = require('ws')
 
 const STATUS = {
   INIT: 0,
-  REQUESTING_VERIFY_CODE: 1,
+  REQUESTING_VERIFICATION_CODE: 1,
   VERIFIYING_CODE: 2,
   CONNECTED: 3
 }
@@ -31,9 +31,9 @@ module.exports = class FutuManager {
     this._clients = []
 
     this._ws.on('connection', ws => {
-      if (this._status === STATUS.REQUESTING_VERIFY_CODE) {
+      if (this._status === STATUS.REQUESTING_VERIFICATION_CODE) {
         this._send({
-          type: 'REQUEST_VERIFY_CODE'
+          type: 'REQUEST_CODE'
         }, [ws])
       }
 
@@ -81,9 +81,9 @@ module.exports = class FutuManager {
 
       if (chunk.includes('req_phone_verify_code')) {
         this._send({
-          type: 'REQUEST_VERIFY_CODE'
+          type: 'REQUEST_CODE'
         })
-        this._status = STATUS.REQUESTING_VERIFY_CODE
+        this._status = STATUS.REQUESTING_VERIFICATION_CODE
         this._resolve()
         return
       }
@@ -119,7 +119,7 @@ module.exports = class FutuManager {
   verify_code (code) {
     this._code = code
 
-    if (this._status === STATUS.REQUESTING_VERIFY_CODE) {
+    if (this._status === STATUS.REQUESTING_VERIFICATION_CODE) {
       this._set_verify_code(code)
       return
     }
