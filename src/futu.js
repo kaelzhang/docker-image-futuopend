@@ -112,13 +112,13 @@ module.exports = class FutuManager {
     ])
 
     this._child.stdout.on('data', data => {
+      const chunk = data.toString()
+
       log(
         'stdout:',
         // Remove redundant new empty lines
-        data.toString().replace(/(?:\s*(?:\r|\n)+)+/, '\n')
+        chunk.replace(/(?:\s*(?:\r|\n)+)+/, '\n')
       )
-
-      const chunk = data.toString()
 
       if (chunk.includes('req_phone_verify_code')) {
         this._send({

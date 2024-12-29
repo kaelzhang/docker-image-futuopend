@@ -1,4 +1,4 @@
-# kaelz/futuopend
+# Docker Image: kaelz/ FutuOpenD
 
 Docker image for FutuOpenD on Ubuntu.
 
