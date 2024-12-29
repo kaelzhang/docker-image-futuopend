@@ -14,60 +14,73 @@ docker pull kaelz/futuopend:latest
 
 8.8.4818_Ubuntu16.04
 
-## Environment Variables
+## Usage
+
+### Environment Variables
 
 - **FUTU_LOGIN_ACCOUNT** required
 - **FUTU_LOGIN_PWD_MD5** required
 - **FUTU_LOGIN_REGION** defaults to `sh`
 - **FUTU_LANG** defaults to `chs`
 - **FUTU_LOG_LEVEL** defaults to `no`
-- **FUTU_PORT** defaults to `11111`
+- **FUTU_PORT** `integer` the port of the FutuOpenD, defaults to `11111`
 - **SERVER_PORT** `integer` the port of the websocket server, defaults to `8000`
 
-## How to start the container
+### Docker Run: How to start the container
 
 ```sh
-docker run -it -p 11111:11111 \
+docker run \
+--name FutuOpenD \
+-e "SERVER_PORT=8081" \
+-p 8081:8081 \
+-p 11111:11111 \
 -e "FUTU_LOGIN_ACCOUNT=$your_futu_id" \
--e "FUTU_LOGIN_PWD_MD5=$your_password_md5" kaelz/futuopend:latest
+-e "FUTU_LOGIN_PWD_MD5=$your_password_md5" \
+kaelz/futuopend:latest
 ```
 
-## WebSocket Server
-
-### Incoming Message
+### WebSocket Server
 
 - **type** `string` the type of the messages, including following types:
   - REQUEST_CODE: which means the FutuOpenD agent requires you to provide an SMS verification code
   - CONNECTED: which means the FutuOpenD agent is connected
+  - STATUS: the server returns the current status to you
 
 ```js
 const {WebSocket} = require('ws')
 
-const ws = new WebSocket('ws://localhost:8080')
+const ws = new WebSocket('ws://localhost:8081')
+
+ws.on('message', msg => {
+  const data = JSON.parse(msg)
+
+  if (data.type === 'REQUEST_CODE') {
+    ws.send(JSON.stringify({
+      type: 'VERIFY_CODE',
+      code: '12345'
+    }))
+    return
+  }
+
+  if (data.type === 'STATUS') {
+    console.log('status:', data.status)
+    return
+  }
+})
 
 ws.on('open', () => {
-  ws.on('message', msg => {
-    const data = JSON.parse(msg)
+  ws.send(JSON.stringify({
+    type: 'STATUS'
+  }))
 
-    if (data.type === 'REQUEST_CODE') {
-      ws.send(JSON.stringify({
-        type: 'VERIFY_CODE',
-        code: '12345'
-      }))
-    }
-  })
+  // If env FUTU_INIT_ON_START=no, we need to manually init futu
+  ws.send(JSON.stringify({
+    type: 'INIT'
+  }))
 })
 ```
 
-### For Mac
-
-It is not easy to connect to a container from MacOS, to run `test.py` from MacOS, see:
-
-- https://docs.docker.com/docker-for-mac/networking/#known-limitations-use-cases-and-workarounds
-- https://github.com/docker/for-mac/issues/2670#issuecomment-372365274
-
 # For contributors
-
 
 ## How to build your own image
 

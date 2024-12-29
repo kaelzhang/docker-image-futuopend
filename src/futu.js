@@ -3,11 +3,15 @@ const {spawn} = require('child_process')
 const {WebSocketServer} = require('ws')
 
 const STATUS = {
+  ORIGIN: -1,
   INIT: 0,
   REQUESTING_VERIFICATION_CODE: 1,
   VERIFIYING_CODE: 2,
   CONNECTED: 3
 }
+
+const log = (...msg) => console.log('[FutuOpenD]', ...msg)
+const error = (...msg) => console.error('[FutuOpenD][Err]', ...msg)
 
 module.exports = class FutuManager {
   constructor (cmd, {
@@ -17,7 +21,8 @@ module.exports = class FutuManager {
     lang,
     log_level,
     api_port,
-    server_port
+    server_port,
+    auto_init = true
   }) {
     this._cmd = cmd
     this._login_account = login_account
@@ -26,6 +31,7 @@ module.exports = class FutuManager {
     this._lang = lang
     this._log_level = log_level
     this._api_port = api_port
+    this._status = STATUS.ORIGIN
 
     this._ws = new WebSocketServer({port: server_port})
     this._clients = []
@@ -44,21 +50,56 @@ module.exports = class FutuManager {
       }
 
       this._clients.push(ws)
-      ws.on('error', err => console.error)
+      ws.on('error', err => {
+        error('ws error:', err)
+      })
+
       ws.on('message', msg => {
         const payload = JSON.parse(msg)
+        const {
+          type,
+          code
+        } = payload
 
-        if (payload.type === 'VERIFY_CODE') {
-          this.verify_code(payload.code)
+        if (type === 'VERIFY_CODE') {
+          this.verify_code(code)
+          return
+        }
+
+        if (type === 'INIT') {
+          this._init()
+          return
+        }
+
+        if (type === 'STATUS') {
+          this._send({
+            type: 'STATUS',
+            status: this._status
+          }, [ws])
           return
         }
       })
     })
 
-    this._init()
+    this._reset_ready_to_receive_code()
+
+    if (auto_init) {
+      this._init()
+    }
+  }
+
+  _reset_ready_to_receive_code () {
+    this._ready_to_receive_code = new Promise((resolve, reject) => {
+      this._resolve = resolve
+    })
   }
 
   _init () {
+    if (this._status >= STATUS.INIT) {
+      // Already inited
+      return
+    }
+
     this._status = STATUS.INIT
 
     this._child = spawn(this._cmd, [
@@ -71,8 +112,8 @@ module.exports = class FutuManager {
     ])
 
     this._child.stdout.on('data', data => {
-      console.log(
-        '[FutuOpenD] stdout:',
+      log(
+        'stdout:',
         // Remove redundant new empty lines
         data.toString().replace(/(?:\s*(?:\r|\n)+)+/, '\n')
       )
@@ -98,18 +139,23 @@ module.exports = class FutuManager {
     })
 
     this._child.stderr.on('data', (data) => {
-      console.error('[FutuOpenD] process error:', data.toString())
+      error('stderr:', data.toString())
     })
 
     this._child.on('error', err => {
-      console.error('[FutuOpenD] process error:', err)
-    })
-
-    this._ready = new Promise((resolve, reject) => {
-      this._resolve = resolve
+      error('process error:', err)
     })
   }
 
+  _set_status (status) {
+    this._status = status
+    this._send({
+      type: 'STATUS',
+      status
+    })
+  }
+
+  // Send msg to specific clients or all clients
   _send (msg, clients) {
     (clients || this._clients).forEach(client => {
       client.send(JSON.stringify(msg))
@@ -124,16 +170,23 @@ module.exports = class FutuManager {
       return
     }
 
-    if (this._status === STATUS.INIT) {
-      this._ready.then(() => {
-        this._set_verify_code(code)
-      })
+    if (this._status === STATUS.CONNECTED) {
+      // Already connected, no need to verify code
+      return
     }
 
-    // avoid verifying code in other status
+    this._ready_to_receive_code.then(() => {
+      this._set_verify_code(code)
+    })
   }
 
   _set_verify_code (code) {
+    // this._ready.then might be called multiple times,
+    //   so we need to test the current status again
+    if (this._status !== STATUS.REQUESTING_VERIFICATION_CODE) {
+      return
+    }
+
     this._status = STATUS.VERIFIYING_CODE
     this._child.stdin.write(`input_phone_verify_code -code=${code}\n`)
     this._child.stdin.end()

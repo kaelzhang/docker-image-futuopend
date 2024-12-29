@@ -53,6 +53,7 @@ ENV FUTU_LANG=en
 ENV FUTU_LOG_LEVEL=no
 ENV FUTU_PORT=11111
 ENV SERVER_PORT=8000
+ENV FUTU_INIT_ON_START=yes
 ENV FUTU_CMD=/usr/src/app/bin/FutuOpenD
 
-CMD [ "node", "/usr/src/app/start.js" ]
+CMD [ "node", "/usr/src/app/src/start.js" ]
