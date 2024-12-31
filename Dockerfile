@@ -1,25 +1,15 @@
 # https://softwaredownload.futunn.com/Futu_OpenD_8.8.4818_Ubuntu16.04.tar.gz
 
-FROM ubuntu:16.04
+FROM ostai/ubuntu-python:16.04-3.8
 
 WORKDIR /usr/src/app
 
-RUN apt-get update \
-&& apt-get install -y curl wget \
-# We have to use node 16.x for ubuntu 16.04 which is required by FutuOpenD
-&& curl -sL https://deb.nodesource.com/setup_16.x | bash - \
-&& apt-get install -y nodejs \
-&& rm -rf /var/lib/apt/lists/*
-
 ARG FUTU_VERSION=8.8.4818_Ubuntu16.04
 
-# AppData.dat
-# FTWebSocket
-# FutuOpenD
-# FutuOpenD.xml
-# libFTAPIChannel.so
-
-RUN wget -O Futu_OpenD.tar.gz https://softwaredownload.futunn.com/Futu_OpenD_$FUTU_VERSION.tar.gz \
+# Install FutuOpenD
+RUN apt-get update \
+&& apt-get install -y curl \
+&& curl -o Futu_OpenD.tar.gz https://softwaredownload.futunn.com/Futu_OpenD_$FUTU_VERSION.tar.gz \
 && tar -xf Futu_OpenD.tar.gz --strip-components=1 \
 && mkdir bin \
 && mv ./Futu_OpenD_${FUTU_VERSION}/AppData.dat ./bin \
@@ -36,14 +26,8 @@ RUN wget -O Futu_OpenD.tar.gz https://softwaredownload.futunn.com/Futu_OpenD_$FU
 && chmod +x bin/FutuOpenD \
 && ls
 
-# COPY ./bin ./bin
-# RUN chmod +x ./bin/FutuOpenD
+RUN pip install websockets env-get
 
-COPY package*.json ./
-
-RUN npm i --omit=dev
-
-# COPY ./src .
 COPY . .
 
 ENV FUTU_LOGIN_ACCOUNT=
@@ -56,4 +40,4 @@ ENV SERVER_PORT=8000
 ENV FUTU_INIT_ON_START=yes
 ENV FUTU_CMD=/usr/src/app/bin/FutuOpenD
 
-CMD [ "node", "/usr/src/app/src/start.js" ]
+CMD [ "python3.8", "/usr/src/app/src/start.py" ]

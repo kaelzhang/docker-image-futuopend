@@ -1,4 +1,8 @@
 *
 !src
-!start.js
-!package*.json
+src/*
+!src/*.py
+!requirements.txt
+
+# !start.js
+# !package*.json
