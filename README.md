@@ -75,10 +75,34 @@ ws.on('open', () => {
 })
 ```
 
+Both downstream and upstream messages are in JSON type.
+
 #### Downstream Messages: From Server to Client
-- `{"type": "REQUEST_CODE"}`: which means the FutuOpenD agent requires you to provide an SMS verification code
-- `{"type": "CONNECTED"}`: which means the FutuOpenD agent is connected
-- `{"type": "STATUS", status: <status>}`: the server returns the current status to you.
+
+```json
+{
+  "type": "REQUEST_CODE"
+}
+```
+
+which means the FutuOpenD agent requires you to provide an SMS verification code
+
+```json
+{
+  "type": "CONNECTED"
+}
+```
+
+which means the FutuOpenD agent is connected
+
+```json
+{
+  "type": "STATUS",
+  "status": -1
+}
+```
+
+the server returns the current status to you.
 
 ### Upstream Messages: From Client to Server
 
