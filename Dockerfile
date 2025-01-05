@@ -1,5 +1,58 @@
 # https://softwaredownload.futunn.com/Futu_OpenD_8.8.4818_Ubuntu16.04.tar.gz
 
+# ==============================================================================
+# Stage 1: Build Python from Source
+# ==============================================================================
+FROM ostai/ubuntu-node:16.04-16 AS builder
+
+# Set non-interactive mode for apt-get
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG PYTHON_VERSION=3.8.20
+
+WORKDIR /usr/src
+
+# Install Python
+# ------------------------------------------------------------------------------
+
+# Python is required to build node-gyp
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+wget \
+build-essential \
+libssl-dev \
+zlib1g-dev \
+libncurses5-dev \
+libffi-dev \
+libsqlite3-dev \
+libreadline-dev \
+libtk8.6 \
+libgdbm-dev \
+ca-certificates \
+xz-utils \
+&& rm -rf /var/lib/apt/lists/*
+
+# Download and extract Python source
+RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \
+&& tar xzf Python-${PYTHON_VERSION}.tgz \
+&& rm Python-${PYTHON_VERSION}.tgz
+
+# Compile and install Python
+WORKDIR /usr/src/Python-${PYTHON_VERSION}
+RUN ./configure --enable-optimizations \
+&& make -j "$(nproc)" \
+&& make altinstall
+
+# /end install python ----------------------------------------------------------
+
+COPY package*.json ./
+
+RUN npm i --omit=dev
+
+# ==============================================================================
+# Stage 2: Create Final Runtime Image
+# ==============================================================================
 FROM ostai/ubuntu-node:16.04-16
 
 WORKDIR /usr/src/app
@@ -31,12 +84,7 @@ RUN wget -O Futu_OpenD.tar.gz https://softwaredownload.futunn.com/Futu_OpenD_$FU
 && chmod +x bin/FutuOpenD \
 && ls
 
-# COPY ./bin ./bin
-# RUN chmod +x ./bin/FutuOpenD
-
-COPY package*.json ./
-
-RUN npm i --omit=dev
+COPY --from=builder ./node_modules .
 
 # COPY ./src .
 COPY . .
