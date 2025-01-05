@@ -1,6 +1,5 @@
-const {spawn} = require('child_process')
-
 const {WebSocketServer} = require('ws')
+const pty = require('node-pty')
 
 const STATUS = {
   ORIGIN: -1,
@@ -102,23 +101,23 @@ module.exports = class FutuManager {
 
     this._status = STATUS.INIT
 
-    this._child = spawn(this._cmd, [
+    this._child = pty.spawn(this._cmd, [
       `-login_account=${this._login_account}`,
       `-login_pwd_md5=${this._login_pwd_md5}`,
       `-login_region=${this._login_region}`,
       `-lang=${this._lang}`,
       `-log_level=${this._log_level}`,
       `-api_port=${this._api_port}`
-    ])
+    ], {
+      name: 'xterm-color',
+      cols: 80,
+      rows: 30,
+      cwd: process.cwd(),
+      env: process.env
+    })
 
-    this._child.stdout.on('data', data => {
-      const chunk = data.toString()
-
-      log(
-        'stdout:',
-        // Remove redundant new empty lines
-        chunk.replace(/(?:\s*(?:\r|\n)+)+/, '\n')
-      )
+    this._child.on('data', chunk => {
+      log('stdout:', chunk)
 
       if (chunk.includes('req_phone_verify_code')) {
         this._send({
@@ -138,12 +137,12 @@ module.exports = class FutuManager {
       }
     })
 
-    this._child.stderr.on('data', (data) => {
-      error('stderr:', data.toString())
-    })
-
-    this._child.on('error', err => {
-      error('process error:', err)
+    this._child.on('exit', (code, signal) => {
+      if (code !== 0) {
+        error(`FutuOpenD exited with code: ${code}, signal: ${signal}`);
+      } else {
+        log(`FutuOpenD exited normally (code: ${code}, signal: ${signal})`);
+      }
     })
   }
 
@@ -188,7 +187,6 @@ module.exports = class FutuManager {
     }
 
     this._status = STATUS.VERIFIYING_CODE
-    this._child.stdin.write(`input_phone_verify_code -code=${code}\n`)
-    this._child.stdin.end()
+    this._child.write(`input_phone_verify_code -code=${code}\r`)
   }
 }

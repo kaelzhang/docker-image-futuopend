@@ -1,23 +1,18 @@
 # https://softwaredownload.futunn.com/Futu_OpenD_8.8.4818_Ubuntu16.04.tar.gz
 
-FROM ubuntu:16.04
+FROM ostai/ubuntu-node:16.04-16
 
 WORKDIR /usr/src/app
 
 RUN apt-get update \
-&& apt-get install -y curl wget \
-# We have to use node 16.x for ubuntu 16.04 which is required by FutuOpenD
-&& curl -sL https://deb.nodesource.com/setup_16.x | bash - \
-&& apt-get install -y nodejs \
-&& rm -rf /var/lib/apt/lists/*
+# We need ca-certificates to make HTTPS requests,
+#   so we should install recommends when installing wget,
+#   avoid using --no-install-recommends
+&& apt-get install -y wget \
+&& rm -rf /var/lib/apt/lists/* \
+&& apt-get clean
 
 ARG FUTU_VERSION=8.8.4818_Ubuntu16.04
-
-# AppData.dat
-# FTWebSocket
-# FutuOpenD
-# FutuOpenD.xml
-# libFTAPIChannel.so
 
 RUN wget -O Futu_OpenD.tar.gz https://softwaredownload.futunn.com/Futu_OpenD_$FUTU_VERSION.tar.gz \
 && tar -xf Futu_OpenD.tar.gz --strip-components=1 \
