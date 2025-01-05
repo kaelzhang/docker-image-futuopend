@@ -4,7 +4,7 @@ Docker image for FutuOpenD on Ubuntu.
 
 The container will start
 - a FutuOpenD agent
-- a websocket server which could help to check the ready status of the FutuOpend agent and make it possible for you to provide SMS verfication code.
+- a websocket server which could help to check the ready status of the FutuOpenD agent and make it possible for you to provide SMS verfication code.
 
 ```sh
 docker pull ostai/futuopend:latest
@@ -41,10 +41,12 @@ ostai/futuopend:latest
 
 ### WebSocket Server
 
+#### Imcoming Messages
+
 - **type** `string` the type of the messages, including following types:
-  - REQUEST_CODE: which means the FutuOpenD agent requires you to provide an SMS verification code
-  - CONNECTED: which means the FutuOpenD agent is connected
-  - STATUS: the server returns the current status to you
+  - `'REQUEST_CODE'`: which means the FutuOpenD agent requires you to provide an SMS verification code
+  - `'CONNECTED'`: which means the FutuOpenD agent is connected
+  - `'STATUS'`: the server returns the current status to you
 
 ```js
 const {WebSocket} = require('ws')
