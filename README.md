@@ -41,13 +41,6 @@ ostai/futuopend:latest
 
 ### WebSocket Server
 
-#### Imcoming Messages
-
-- **type** `string` the type of the messages, including following types:
-  - `'REQUEST_CODE'`: which means the FutuOpenD agent requires you to provide an SMS verification code
-  - `'CONNECTED'`: which means the FutuOpenD agent is connected
-  - `'STATUS'`: the server returns the current status to you
-
 ```js
 const {WebSocket} = require('ws')
 
@@ -81,6 +74,15 @@ ws.on('open', () => {
   }))
 })
 ```
+
+#### Downstream Messages: From Server to Client
+- `{"type": "REQUEST_CODE"}`: which means the FutuOpenD agent requires you to provide an SMS verification code
+- `{"type": "CONNECTED"}`: which means the FutuOpenD agent is connected
+- `{"type": "STATUS", status: <status>}`: the server returns the current status to you.
+
+### Upstream Messages: From Client to Server
+
+TODO
 
 # For contributors
 
