@@ -1,4 +1,4 @@
-# Docker Image: kaelz/ FutuOpenD
+# Docker Image: ostai/ FutuOpenD
 
 Docker image for FutuOpenD on Ubuntu.
 
@@ -7,7 +7,7 @@ The container will start
 - a websocket server which could help to check the ready status of the FutuOpend agent and make it possible for you to provide SMS verfication code.
 
 ```sh
-docker pull kaelz/futuopend:latest
+docker pull ostai/futuopend:latest
 ```
 
 ## Current FutuOpenD Image Version
@@ -36,7 +36,7 @@ docker run \
 -p 11111:11111 \
 -e "FUTU_LOGIN_ACCOUNT=$your_futu_id" \
 -e "FUTU_LOGIN_PWD_MD5=$your_password_md5" \
-kaelz/futuopend:latest
+ostai/futuopend:latest
 ```
 
 ### WebSocket Server
@@ -85,6 +85,7 @@ ws.on('open', () => {
 ## How to build your own image
 
 ```sh
+TAG=ostai/futuopend
 VERSION=8.8.4818
 FUTU_VERSION="$VERSION"_Ubuntu16.04
 
@@ -96,7 +97,7 @@ docker build -t $TAG:$VERSION \
 For example:
 
 ```sh
-docker build -t kaelz/futuopend:8.8.4818 \
+docker build -t ostai/futuopend:8.8.4818 \
   --build-arg FUTU_VERSION=8.8.4818_Ubuntu16.04 \
   .
 ```

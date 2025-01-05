@@ -9,8 +9,7 @@ FROM ostai/ubuntu-node:16.04-16 AS builder
 ENV DEBIAN_FRONTEND=noninteractive
 
 ARG PYTHON_VERSION=3.8.20
-
-WORKDIR /usr/src
+ARG PYTHON_SHORT_VERSION=3.8
 
 # Install Python
 # ------------------------------------------------------------------------------
@@ -40,9 +39,19 @@ RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VER
 
 # Compile and install Python
 WORKDIR /usr/src/Python-${PYTHON_VERSION}
+
 RUN ./configure --enable-optimizations \
 && make -j "$(nproc)" \
 && make altinstall
+
+# Create symbolic links for python and python3
+RUN ln -s /usr/local/bin/python${PYTHON_SHORT_VERSION} /usr/local/bin/python3 \
+&& ln -s /usr/local/bin/python${PYTHON_SHORT_VERSION} /usr/local/bin/python
+
+# Verify python installation
+RUN python --version && python3 --version
+
+ENV PYTHON=/usr/local/bin/python${PYTHON_SHORT_VERSION}
 
 # /end install python ----------------------------------------------------------
 
