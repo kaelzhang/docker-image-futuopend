@@ -32,6 +32,8 @@ ca-certificates \
 xz-utils \
 && rm -rf /var/lib/apt/lists/*
 
+WORKDIR /usr/src
+
 # Download and extract Python source
 RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \
 && tar xzf Python-${PYTHON_VERSION}.tgz \
@@ -55,8 +57,11 @@ ENV PYTHON=/usr/local/bin/python${PYTHON_SHORT_VERSION}
 
 # /end install python ----------------------------------------------------------
 
+WORKDIR /usr/src
+
 COPY package*.json ./
 
+# This will install dependencies in /usr/src/node_modules
 RUN npm i --omit=dev
 
 # ==============================================================================
@@ -93,7 +98,7 @@ RUN wget -O Futu_OpenD.tar.gz https://softwaredownload.futunn.com/Futu_OpenD_$FU
 && chmod +x bin/FutuOpenD \
 && ls
 
-COPY --from=builder ./node_modules .
+COPY --from=builder /usr/src/node_modules .
 
 # COPY ./src .
 COPY . .
