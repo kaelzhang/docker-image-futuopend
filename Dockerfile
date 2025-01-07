@@ -16,7 +16,7 @@ ARG PYTHON_SHORT_VERSION=3.8
 
 # Python is required to build node-gyp
 
-# Install build dependencies
+# Install build dependencies for python
 RUN apt-get update && apt-get install -y --no-install-recommends \
 wget \
 build-essential \
