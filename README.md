@@ -102,11 +102,34 @@ which means the FutuOpenD agent is connected
 }
 ```
 
-the server returns the current status to you.
+The server returns the current status to you.
 
 #### Upstream Messages: From Client to Server
 
-TODO
+```json
+{
+  "type": "INIT"
+}
+```
+
+Tells the server to initialize the Futu OpenD agent, which only works when `FUTU_INIT_ON_START` is set to `'no'`
+
+```json
+{
+  "type": "STATUS"
+}
+```
+
+Asks the server to response the current status of the server
+
+```json
+{
+  "type": "VERIFY_CODE",
+  "code": "123456"
+}
+```
+
+Submits the SMS verification code to Futu OpenD agent.
 
 # For contributors
 
