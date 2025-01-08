@@ -10,6 +10,12 @@ The container will start
 docker pull ostai/futuopend:latest
 ```
 
+Or
+
+```sh
+docker pull ostai/futuopend:8.8.4818
+```
+
 ## Current FutuOpenD Image Version
 
 8.8.4818_Ubuntu16.04
