@@ -29,13 +29,14 @@ docker pull ostai/futuopend:8.8.4818
 
 ### Environment Variables
 
-- **FUTU_LOGIN_ACCOUNT** required
-- **FUTU_LOGIN_PWD_MD5** required
-- **FUTU_LOGIN_REGION** defaults to `sh`
-- **FUTU_LANG** defaults to `chs`
-- **FUTU_LOG_LEVEL** defaults to `no`
+- **FUTU_LOGIN_ACCOUNT** `string` required
+- **FUTU_LOGIN_PWD_MD5** `string` required
+- **FUTU_LOGIN_REGION** `string` defaults to `sh`
+- **FUTU_LANG** `string` defaults to `chs`
+- **FUTU_LOG_LEVEL** `string` defaults to `no`
 - **FUTU_PORT** `integer` the port of the FutuOpenD, defaults to `11111`
 - **SERVER_PORT** `integer` the port of the websocket server, defaults to `8000`
+- **FUTU_INIT_ON_START** `string="yes"` whether it will initialize the Futu OpenD agent on the start, defaults to `"yes"`
 
 ### Docker Run: How to start the container
 
