@@ -103,6 +103,10 @@ COPY --from=builder /usr/src/node_modules .
 # COPY ./src .
 COPY . .
 
+# Check if the node dependencies are ready
+RUN node ./src/check.js \
+&& rm ./src/check.js
+
 ENV FUTU_LOGIN_ACCOUNT=
 ENV FUTU_LOGIN_PWD_MD5=
 ENV FUTU_LOGIN_REGION=sh
