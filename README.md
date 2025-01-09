@@ -6,6 +6,11 @@ The container will start
 - A FutuOpenD agent
 - A websocket server which could help to check the ready status of the FutuOpenD agent and make it possible for you to provide SMS verfication code.
 
+The image is always built with `DOCKER_DEFAULT_PLATFORM=linux/amd64` ([why?](https://stackoverflow.com/questions/71040681/qemu-x86-64-could-not-open-lib64-ld-linux-x86-64-so-2-no-such-file-or-direc)) and could be `docker-run` on both Ubuntu and MacOS.
+
+
+## Install
+
 ```sh
 docker pull ostai/futuopend:latest
 ```
