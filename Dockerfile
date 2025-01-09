@@ -98,13 +98,14 @@ RUN wget -O Futu_OpenD.tar.gz https://softwaredownload.futunn.com/Futu_OpenD_$FU
 && chmod +x bin/FutuOpenD \
 && ls
 
-COPY --from=builder /usr/src/node_modules .
+COPY --from=builder /usr/src/node_modules ./node_modules
 
 # COPY ./src .
 COPY . .
 
 # Check if the node dependencies are ready
-RUN node ./src/check.js \
+RUN ls -la ./node_modules \
+&& node ./src/check.js \
 && rm ./src/check.js
 
 ENV FUTU_LOGIN_ACCOUNT=

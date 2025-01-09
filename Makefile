@@ -6,6 +6,7 @@ export FUTU_VERSION=8.8.4818
 # Ref: https://stackoverflow.com/questions/71040681/qemu-x86-64-could-not-open-lib64-ld-linux-x86-64-so-2-no-such-file-or-direc
 build-osx:
 	DOCKER_DEFAULT_PLATFORM=linux/arm64 docker build \
+		--progress=plain \
 		-t ostai/futuopend:$(FUTU_VERSION) \
   		--build-arg FUTU_VERSION=$(FUTU_VERSION)_Ubuntu16.04 \
 		.
