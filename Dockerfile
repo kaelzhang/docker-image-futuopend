@@ -98,6 +98,9 @@ RUN wget -O Futu_OpenD.tar.gz https://softwaredownload.futunn.com/Futu_OpenD_$FU
 && chmod +x bin/FutuOpenD \
 && ls
 
+# If we `COPY --from=builder /usr/src/node_modules .`,
+#   there will be no /usr/src/app/node_modules directory,
+#   but all content of node_modules will be copied to WORKDIR
 COPY --from=builder /usr/src/node_modules ./node_modules
 
 # COPY ./src .

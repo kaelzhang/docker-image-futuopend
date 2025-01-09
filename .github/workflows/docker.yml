@@ -52,7 +52,7 @@ jobs:
           tags: |
             ostai/futuopend:8.8.4818
             ostai/futuopend:latest
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
       # Step 7: Move cache for future builds
