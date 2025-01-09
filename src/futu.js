@@ -117,7 +117,7 @@ module.exports = class FutuManager {
     })
 
     this._child.on('data', chunk => {
-      log('stdout:', chunk)
+      process.stdout.write(chunk)
 
       if (chunk.includes('req_phone_verify_code')) {
         this._send({
