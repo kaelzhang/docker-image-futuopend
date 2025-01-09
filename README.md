@@ -1,10 +1,10 @@
 # Docker Image: ostai/ FutuOpenD
 
-Docker image for FutuOpenD on Ubuntu.
+Docker image for FutuOpenD on Ubuntu, the one that really works and could handle SMS verification requests.
 
 The container will start
-- a FutuOpenD agent
-- a websocket server which could help to check the ready status of the FutuOpenD agent and make it possible for you to provide SMS verfication code.
+- A FutuOpenD agent
+- A websocket server which could help to check the ready status of the FutuOpenD agent and make it possible for you to provide SMS verfication code.
 
 ```sh
 docker pull ostai/futuopend:latest
