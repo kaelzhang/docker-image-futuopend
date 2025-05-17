@@ -21,9 +21,11 @@ Or
 docker pull ostai/futuopend:9.2.5208
 ```
 
-## Current FutuOpenD Image Version
+## Lastest FutuOpenD Image Version
 
 9.2.5208_Ubuntu16.04
+
+[Other versions](https://hub.docker.com/r/ostai/futuopend/tags)
 
 ## Usage
 

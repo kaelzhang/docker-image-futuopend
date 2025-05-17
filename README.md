@@ -24,9 +24,11 @@ docker pull ostai/futuopend:latest
 docker pull ostai/futuopend:9.2.5208
 ```
 
-## 当前 FutuOpenD 镜像版本
+## 最新支持的 FutuOpenD 镜像版本
 
 9.2.5208_Ubuntu16.04
+
+[其他版本](https://hub.docker.com/r/ostai/futuopend/tags)
 
 ## 用法
 
