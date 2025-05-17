@@ -1,6 +1,6 @@
 .PHONY: build
 
-export FUTU_VERSION=8.8.4818
+export FUTU_VERSION=9.2.5208
 
 # FutuOpenD could only be built as linux/amd64, or there will be an issue:
 # Issue on Apple Silicon
@@ -23,3 +23,10 @@ debug:
 		-e "FUTU_LOG_LEVEL=$(FUTU_LOG_LEVEL)" \
 		-e "SERVER_PORT=8083" \
 		ostai/futuopend:$(FUTU_VERSION)
+
+
+push:
+	docker push ostai/futuopend:$(FUTU_VERSION)
+
+
+.PHONY: build debug push

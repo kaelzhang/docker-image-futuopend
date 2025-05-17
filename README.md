@@ -148,9 +148,13 @@ Submits the SMS verification code to Futu OpenD agent.
 ## How to build your own image
 
 ```sh
+export VERSION=9.2.5208
+export FUTU_VERSION=${VERSION}_Ubuntu16.04
+```
+
+```sh
 TAG=ostai/futuopend
-VERSION=8.8.4818
-FUTU_VERSION="$VERSION"_Ubuntu16.04
+
 
 docker build -t $TAG:$VERSION \
   --build-arg FUTU_VERSION=$FUTU_VERSION \
@@ -160,7 +164,7 @@ docker build -t $TAG:$VERSION \
 For example:
 
 ```sh
-docker build -t ostai/futuopend:8.8.4818 \
-  --build-arg FUTU_VERSION=8.8.4818_Ubuntu16.04 \
+docker build -t ostai/futuopend:${VERSION} \
+  --build-arg FUTU_VERSION=${FUTU_VERSION} \
   .
 ```
