@@ -41,6 +41,7 @@ docker pull ostai/futuopend:9.2.5208
 - **FUTU_PORT** `integer`，FutuOpenD 的端口，默认 `11111`
 - **SERVER_PORT** `integer`，websocket 服务器的端口，默认 `8000`
 - **FUTU_INIT_ON_START** `string="yes"`，容器启动时是否初始化 Futu OpenD agent，默认 `"yes"`
+- **FUTU_SUPERVISE_PROCESS** `string="yes"` 是否需要监控 FutuOpenD 子进程，并且在退出的时候尝试重新连接。
 
 ### Docker Run：如何启动容器
 
@@ -117,6 +118,16 @@ ws.on('open', () => {
 }
 ```
 服务器返回当前状态。
+
+```json
+{
+  "type": "CLOSED",
+  code,
+  signal
+}
+```
+
+表示 FutuOpenD 子进行（意外）退出
 
 #### 上行消息：客户端 -> 服务器
 
