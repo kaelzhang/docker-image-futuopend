@@ -6,7 +6,10 @@ const FutuManager = require('./futu')
 
 const login_account = env('FUTU_LOGIN_ACCOUNT', env.required)
 const login_pwd_md5 = env('FUTU_LOGIN_PWD_MD5', null, '')
-const login_region = env('FUTU_LOGIN_REGION', env.required)
+
+// Removed in new versions of FutuOpenD
+// const login_region = env('FUTU_LOGIN_REGION', env.required)
+
 const lang = env('FUTU_LANG', env.required)
 const log_level = env('FUTU_LOG_LEVEL', null, 'no')
 const api_port = env('FUTU_PORT', env.integer, 11111)
@@ -18,7 +21,7 @@ const FUTU_CMD = env('FUTU_CMD', env.required)
 const futu = new FutuManager(FUTU_CMD, {
   login_account,
   login_pwd_md5,
-  login_region,
+  // login_region,
   lang,
   log_level,
   api_port,

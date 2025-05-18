@@ -26,7 +26,9 @@ debug:
 
 
 push:
+	docker tag ostai/futuopend:$(FUTU_VERSION) ostai/futuopend:latest
 	docker push ostai/futuopend:$(FUTU_VERSION)
+	docker push ostai/futuopend:latest
 
 
 .PHONY: build debug push
