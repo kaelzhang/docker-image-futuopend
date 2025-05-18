@@ -1,3 +1,5 @@
+[中文版](https://github.com/kaelzhang/docker-image-futuopend)
+
 # Docker Image: ostai/ FutuOpenD
 
 Docker image for FutuOpenD on Ubuntu, the one that really works and could handle SMS verification requests.
@@ -12,13 +14,14 @@ The image is always built with `DOCKER_DEFAULT_PLATFORM=linux/amd64` ([why?](htt
 ## Install
 
 ```sh
-docker pull ostai/futuopend:latest
+# Recommended (to pull an image by providing specific tag name)
+docker pull ostai/futuopend:9.2.5208
 ```
 
 Or
 
 ```sh
-docker pull ostai/futuopend:9.2.5208
+docker pull ostai/futuopend:latest
 ```
 
 ## Lastest FutuOpenD Image Version
