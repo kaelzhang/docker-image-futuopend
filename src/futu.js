@@ -2,6 +2,7 @@ const {WebSocketServer} = require('ws')
 const pty = require('node-pty')
 
 const STATUS = {
+  CLOSED: -2,
   ORIGIN: -1,
   INIT: 0,
   REQUESTING_VERIFICATION_CODE: 1,
@@ -9,10 +10,7 @@ const STATUS = {
   CONNECTED: 3
 }
 
-const log = (...msg) => console.log('[FutuOpenD]', ...msg)
-const error = (...msg) => console.error('[FutuOpenD][Err]', ...msg)
-
-module.exports = class FutuManager {
+class FutuManager {
   constructor (cmd, {
     login_account,
     login_pwd_md5,
@@ -21,7 +19,12 @@ module.exports = class FutuManager {
     log_level,
     api_port,
     server_port,
-    auto_init = true
+
+    // Whether to auto-init the FutuOpenD process
+    auto_init = true,
+
+    // Whether to supervise the FutuOpenD process, and restart it if it closes
+    supervise = true
   }) {
     this._cmd = cmd
     this._login_account = login_account
@@ -31,8 +34,14 @@ module.exports = class FutuManager {
     this._log_level = log_level
     this._api_port = api_port
     this._status = STATUS.ORIGIN
+    this._supervise = supervise
 
-    this._ws = new WebSocketServer({port: server_port})
+    this._should_log = log_level !== 'no'
+
+    this._ws = new WebSocketServer({port: server_port}, () => {
+      this._log(`WebSocket server is listening on port ${server_port}`)
+    })
+
     this._clients = []
 
     this._ws.on('connection', ws => {
@@ -50,7 +59,7 @@ module.exports = class FutuManager {
 
       this._clients.push(ws)
       ws.on('error', err => {
-        error('ws error:', err)
+        this._error('ws error:', err)
       })
 
       ws.on('message', msg => {
@@ -84,6 +93,26 @@ module.exports = class FutuManager {
 
     if (auto_init) {
       this._init()
+    }
+  }
+
+  _log (...msg) {
+    if (this._should_log) {
+      console.log('[FutuOpenD]', ...msg)
+    }
+  }
+
+  _error (...msg) {
+    if (this._should_log) {
+      console.error('[FutuOpenD][Err]', ...msg)
+    }
+  }
+
+  _logExit (code, signal, type = 'exited') {
+    if (code !== 0) {
+      this._error(`FutuOpenD ${type} with code: ${code}, signal: ${signal}`)
+    } else {
+      this._log(`FutuOpenD ${type} normally (code: ${code}, signal: ${signal})`)
     }
   }
 
@@ -137,20 +166,29 @@ module.exports = class FutuManager {
       }
     })
 
-    this._child.on('exit', (code, signal) => {
-      if (code !== 0) {
-        error(`FutuOpenD exited with code: ${code}, signal: ${signal}`);
-      } else {
-        log(`FutuOpenD exited normally (code: ${code}, signal: ${signal})`);
-      }
+    this._child.on('error', err => {
+      this._error('FutuOpenD error:', err)
     })
-  }
 
-  _set_status (status) {
-    this._status = status
-    this._send({
-      type: 'STATUS',
-      status
+    this._child.on('exit', (code, signal) => {
+      this._logExit(code, signal)
+    })
+
+    this._child.on('close', (code, signal) => {
+      this._logExit(code, signal, 'closed')
+
+      this._status = STATUS.CLOSED
+      this._send({
+        type: 'CLOSED',
+        code,
+        signal
+      })
+
+      this._reset_ready_to_receive_code()
+
+      if (this._supervise) {
+        this._init()
+      }
     })
   }
 
@@ -189,4 +227,9 @@ module.exports = class FutuManager {
     this._status = STATUS.VERIFIYING_CODE
     this._child.write(`input_phone_verify_code -code=${code}\r`)
   }
+}
+
+
+module.exports = {
+  FutuManager
 }

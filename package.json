@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "dependencies": {
     "@ostai/env": "^1.1.0",
     "node-pty": "^1.0.0",
