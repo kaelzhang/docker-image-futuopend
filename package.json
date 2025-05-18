@@ -2,9 +2,9 @@
   "private": true,
   "version": "2.0.0",
   "dependencies": {
-    "@ostai/env": "^1.1.0",
+    "@ostai/env": "^1.1.2",
     "node-pty": "^1.0.0",
-    "ws": "^8.13.0"
+    "ws": "^8.18.2"
   },
   "scripts": {
     "start": "node start.js"
