@@ -36,7 +36,7 @@ docker pull ostai/futuopend:9.2.5208
 
 - **FUTU_LOGIN_ACCOUNT** `string`（必填）
 - **FUTU_LOGIN_PWD_MD5** `string`（必填）
-- **FUTU_LOGIN_REGION** `string`，默认 `sh`
+- ~~ **FUTU_LOGIN_REGION** `string`，默认 `sh` ~~
 - **FUTU_LANG** `string`，默认 `chs`
 - **FUTU_LOG_LEVEL** `string`，默认 `no`
 - **FUTU_PORT** `integer`，FutuOpenD 的端口，默认 `11111`
