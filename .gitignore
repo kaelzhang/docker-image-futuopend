@@ -1,6 +1,8 @@
 # Project
 /bin
 /start.sh
+futuopend.json
+
 
 # Numerous always-ignore extensions
 *.bak

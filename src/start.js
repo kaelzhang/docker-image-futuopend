@@ -21,7 +21,7 @@ const supervise = env('FUTU_SUPERVISE_PROCESS', env.boolean, true)
 
 const FUTU_CMD = env('FUTU_CMD', env.required)
 
-const futu = new FutuManager(FUTU_CMD, {
+new FutuManager(FUTU_CMD, {
   login_account,
   login_pwd_md5,
   // login_region,
