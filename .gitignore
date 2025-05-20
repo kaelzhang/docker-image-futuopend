@@ -25,7 +25,8 @@ nohup.out
 
 # node
 # We should include package-lock.json in the project to avoid behavior change
-# package-lock.json
+package-lock.json
+.nyc_output
 
 # OS or Editor folders
 .DS_Store

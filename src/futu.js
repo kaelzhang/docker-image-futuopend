@@ -231,5 +231,6 @@ class FutuManager {
 
 
 module.exports = {
-  FutuManager
+  FutuManager,
+  STATUS
 }
