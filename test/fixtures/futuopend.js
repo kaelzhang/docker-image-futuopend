@@ -47,13 +47,13 @@ setTimeout(() => {
       setTimeout(() => {
         // Output login success message
         console.log('Login successful')
-      }, 100)
+      }, 500)
     }
   })
-}, 200)
+}, 500)
 
 if (count < 2) {
   setTimeout(() => {
     process.exit(3)
-  }, 500)
+  }, 1200)
 }
