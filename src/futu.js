@@ -14,7 +14,6 @@ class FutuManager {
   constructor (cmd, {
     login_account,
     login_pwd_md5,
-    login_region,
     lang,
     log_level,
     api_port,
@@ -29,7 +28,6 @@ class FutuManager {
     this._cmd = cmd
     this._login_account = login_account
     this._login_pwd_md5 = login_pwd_md5
-    this._login_region = login_region
     this._lang = lang
     this._log_level = log_level
     this._api_port = api_port
@@ -98,21 +96,13 @@ class FutuManager {
 
   _log (...msg) {
     if (this._should_log) {
-      console.log('[FutuOpenD]', ...msg)
+      console.log('[INFO]', ...msg)
     }
   }
 
   _error (...msg) {
     if (this._should_log) {
-      console.error('[FutuOpenD][Err]', ...msg)
-    }
-  }
-
-  _logExit (code, signal, type = 'exited') {
-    if (code !== 0) {
-      this._error(`FutuOpenD ${type} with code: ${code}, signal: ${signal}`)
-    } else {
-      this._log(`FutuOpenD ${type} normally (code: ${code}, signal: ${signal})`)
+      console.error('[ERROR]', ...msg)
     }
   }
 
@@ -130,10 +120,17 @@ class FutuManager {
 
     this._status = STATUS.INIT
 
+    this._log('Initializing FutuOpenD with options ...', {
+      login_account: this._login_account,
+      login_pwd_md5: '<hidden>',
+      lang: this._lang,
+      log_level: this._log_level,
+      api_port: this._api_port
+    })
+
     this._child = pty.spawn(this._cmd, [
       `-login_account=${this._login_account}`,
       `-login_pwd_md5=${this._login_pwd_md5}`,
-      `-login_region=${this._login_region}`,
       `-lang=${this._lang}`,
       `-log_level=${this._log_level}`,
       `-api_port=${this._api_port}`
@@ -171,17 +168,15 @@ class FutuManager {
     })
 
     this._child.on('exit', (code, signal) => {
-      this._logExit(code, signal)
+      this._error('FutuOpenD exited')
     })
 
-    this._child.on('close', (code, signal) => {
-      this._logExit(code, signal, 'closed')
+    this._child.on('close', () => {
+      this._log('FutuOpenD closed')
 
       this._status = STATUS.CLOSED
       this._send({
-        type: 'CLOSED',
-        code,
-        signal
+        type: 'CLOSED'
       })
 
       this._reset_ready_to_receive_code()

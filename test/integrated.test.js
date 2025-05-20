@@ -2,6 +2,7 @@ const test = require('ava')
 const fs = require('node:fs')
 const {join} = require('node:path')
 const {spawn} = require('node:child_process')
+const log = require('node:util').debuglog('futuopend')
 
 const findFreePorts = require('find-free-ports')
 const {WebSocket} = require('ws')
@@ -9,7 +10,6 @@ const {WebSocket} = require('ws')
 const {
   STATUS
 } = require('../src/futu')
-
 
 class Getter {
   constructor () {
@@ -63,13 +63,16 @@ test('start integrated test', async t => {
   } = Promise.withResolvers()
 
   const child = spawn(join(__dirname, '..', 'src', 'start.js'), {
-    stdio: 'inherit'
+    stdio: 'pipe'
   })
 
   let spawnOutput = ''
 
-  child.on('data', data => {
-    spawnOutput += data.toString()
+  child.stdout.on('data', data => {
+    const content = data.toString()
+
+    log('data:', content)
+    spawnOutput += content
 
     if (spawnOutput.includes('listening')) {
       spawnResolve()
@@ -95,25 +98,62 @@ test('start integrated test', async t => {
 
 
   ws.on('open', () => {
-    console.log('open')
+    log('open')
     wsResolve()
   })
 
+  log('before await wsPromise')
   await wsPromise
+  log('after await wsPromise')
 
   ws.send(JSON.stringify({
     type: 'STATUS'
   }))
 
-  t.is(await getter.get(), {
+  t.deepEqual(await getter.get(), {
     type: 'STATUS',
     status: STATUS.ORIGIN
   })
 
-  // If env FUTU_INIT_ON_START=no, we need to manually init futu
-  // ws.send(JSON.stringify({
-  //   type: 'INIT'
-  // }))
+  ws.send(JSON.stringify({
+    type: 'INIT'
+  }))
 
+  const doInit = async n => {
+    log('round 1 ...')
+
+    t.deepEqual(await getter.get(), {
+      type: 'REQUEST_CODE'
+    }, `REQUEST_CODE ${n}`)
+
+    ws.send(JSON.stringify({
+      type: 'VERIFY_CODE',
+      code: '12345'
+    }))
+
+    t.deepEqual(await getter.get(), {
+      type: 'CONNECTED'
+    }, `CONNECTED ${n}`)
+  }
+
+  await doInit(1)
+
+  log('closed 1 ...')
+
+  t.deepEqual(await getter.get(), {
+    type: 'CLOSED'
+  })
+
+  await doInit(2)
+
+  log('closed 2 ...')
+
+  t.deepEqual(await getter.get(), {
+    type: 'CLOSED'
+  })
+
+  await doInit(3)
+
+  child.kill()
 })
 

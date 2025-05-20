@@ -7,7 +7,7 @@
     "ws": "^8.18.2"
   },
   "scripts": {
-    "test": "NODE_OPTIONS=--trace-warnings nyc ava --timeout=10s --verbose",
+    "test": "NODE_DEBUG=futuopend NODE_OPTIONS=--trace-warnings nyc ava --timeout=10s --verbose",
     "start": "node start.js"
   },
   "ava": {
