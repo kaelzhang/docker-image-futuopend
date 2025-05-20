@@ -3,6 +3,7 @@ const fs = require('node:fs')
 const {join} = require('node:path')
 const {spawn} = require('node:child_process')
 const _log = require('node:util').debuglog('futuopend')
+const {setTimeout} = require('node:timers/promises')
 
 const findFreePorts = require('find-free-ports')
 const {WebSocket} = require('ws')
@@ -85,11 +86,15 @@ class WSTester {
     await this._openPromise
   }
 
+  send (msg) {
+    this._ws.send(JSON.stringify(msg))
+  }
+
   async init () {
     if (this._checkStatus) {
-      this._ws.send(JSON.stringify({
+      this.send({
         type: 'STATUS'
-      }))
+      })
 
       this._t.deepEqual(await this._getter.get(), {
         type: 'STATUS',
@@ -97,9 +102,9 @@ class WSTester {
       })
     }
 
-    this._ws.send(JSON.stringify({
+    this.send({
       type: 'INIT'
-    }))
+    })
   }
 
   async test () {
@@ -122,10 +127,10 @@ class WSTester {
       }
 
       if (this._sendCode) {
-        this._ws.send(JSON.stringify({
+        this.send({
           type: 'VERIFY_CODE',
           code: '12345'
-        }))
+        })
       }
 
       if (
@@ -166,7 +171,7 @@ class WSTester {
 }
 
 
-test('start integrated test', async t => {
+const startServer = async () => {
   const storePath = join(__dirname, 'fixtures/futuopend.json')
 
   try {
@@ -210,6 +215,21 @@ test('start integrated test', async t => {
   })
 
   await spawnPromise
+
+  return {
+    port,
+    kill: () => {
+      child.kill()
+    }
+  }
+}
+
+
+test('start integrated test', async t => {
+  const {
+    port,
+    kill
+  } = await startServer()
 
   const testers = []
 
@@ -264,6 +284,12 @@ test('start integrated test', async t => {
 
   await Promise.all(testers)
 
-  child.kill()
+  tester1.send({
+    type: 'VERIFY_CODE',
+    code: '12345'
+  })
+  await setTimeout(100)
+
+  kill()
 })
 

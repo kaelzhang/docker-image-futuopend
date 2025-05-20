@@ -108,7 +108,7 @@ class FutuManager {
 
   _reset_ready_to_receive_code () {
     this._ready_to_receive_code = new Promise((resolve, reject) => {
-      this._resolve = resolve
+      this._resolveReadyToReceiveCode = resolve
     })
   }
 
@@ -150,7 +150,7 @@ class FutuManager {
           type: 'REQUEST_CODE'
         })
         this._status = STATUS.REQUESTING_VERIFICATION_CODE
-        this._resolve()
+        this._resolveReadyToReceiveCode()
         return
       }
 
