@@ -17,8 +17,9 @@
     ]
   },
   "devDependencies": {
-    "find-free-ports": "^3.1.1",
     "ava": "^6.2.0",
-    "nyc": "^17.1.0"
+    "find-free-ports": "^3.1.1",
+    "nyc": "^17.1.0",
+    "promise.withresolvers": "^1.0.3"
   }
 }

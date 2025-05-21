@@ -9,6 +9,8 @@ const {
   STATUS
 } = require('../src/futu')
 
+require('./shim')
+
 class Getter {
   constructor () {
     this.reset()

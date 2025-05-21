@@ -12,6 +12,8 @@ const {
   STATUS
 } = require('../src/futu')
 
+require('./shim')
+
 
 test.serial('start integrated test', async t => {
   const {
