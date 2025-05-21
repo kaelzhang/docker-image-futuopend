@@ -62,7 +62,9 @@ class FutuOpenDManager {
       const data = JSON.parse(msg)
 
       if (data.type === 'STATUS') {
-        this.#statusResolve(data.status)
+        if (this.#statusResolve) {
+          this.#statusResolve(data.status)
+        }
       }
 
       this[KEY_GETTER].set(data)

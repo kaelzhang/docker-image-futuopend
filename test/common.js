@@ -6,8 +6,9 @@ const fs = require('node:fs')
 const _log = require('node:util').debuglog('futuopend')
 
 const {
-  STATUS
-} = require('../src/futu')
+  STATUS,
+  KEY_GETTER
+} = require('../src/constants')
 
 const {
   FutuOpenDManager
@@ -16,33 +17,7 @@ const {
 require('./shim')
 
 
-class Getter {
-  constructor () {
-    this.reset()
-  }
-
-  reset () {
-    const {promise, resolve} = Promise.withResolvers()
-
-    this._promise = promise
-    this._resolve = resolve
-  }
-
-  set (value) {
-    this._resolve(value)
-  }
-
-  async get () {
-    const value = await this._promise
-
-    this.reset()
-
-    return value
-  }
-}
-
-
-class WSTester {
+class WSTester extends FutuOpenDManager {
   constructor (n, {
     port,
     t,
@@ -52,6 +27,8 @@ class WSTester {
     sendCode = true,
     firstMessageType
   }) {
+    super(`ws://localhost:${port}`)
+
     this._n = n
     this._t = t
     this._onRequestCode = onRequestCode
@@ -60,49 +37,49 @@ class WSTester {
     this._sendCode = sendCode
     this._firstMessageType = firstMessageType
 
-    const ws = new WebSocket(`ws://localhost:${port}`)
-    this._ws = ws
+    // const ws = new WebSocket(`ws://localhost:${port}`)
+    // this._ws = ws
 
-    const {
-      promise,
-      resolve
-    } = Promise.withResolvers()
-    this._openPromise = promise
+    // const {
+    //   promise,
+    //   resolve
+    // } = Promise.withResolvers()
+    // this._openPromise = promise
 
-    const getter = new Getter()
-    this._getter = getter
+    // const getter = new Getter()
+    // this._getter = getter
 
-    ws.on('message', msg => {
-      const data = JSON.parse(msg)
-      getter.set(data)
-    })
+    // ws.on('message', msg => {
+    //   const data = JSON.parse(msg)
+    //   getter.set(data)
+    // })
 
-    ws.on('open', () => {
-      resolve()
-    })
+    // ws.on('open', () => {
+    //   resolve()
+    // })
   }
 
   async equal (...args) {
-    const data = await this._getter.get()
+    const data = await this[KEY_GETTER].get()
 
     this._t.deepEqual(data, ...args)
   }
 
   reset () {
-    this._getter.reset()
+    this[KEY_GETTER].reset()
   }
 
   _log (...msg) {
     _log(`[${this._n}]`, ...msg)
   }
 
-  async ready () {
-    await this._openPromise
-  }
+  // async ready () {
+  //   await this._openPromise
+  // }
 
-  send (msg) {
-    this._ws.send(JSON.stringify(msg))
-  }
+  // send (msg) {
+  //   this._ws.send(JSON.stringify(msg))
+  // }
 
   async init () {
     if (typeof this._checkStatus === 'number') {
@@ -116,9 +93,7 @@ class WSTester {
       })
     }
 
-    this.send({
-      type: 'INIT'
-    })
+    super.init()
   }
 
   async test () {
