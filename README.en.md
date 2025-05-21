@@ -126,9 +126,7 @@ The server returns the current status to you.
 
 ```json
 {
-  "type": "CLOSED",
-  code,
-  signal
+  "type": "CLOSED"
 }
 ```
 

@@ -1,4 +1,5 @@
 const test = require('ava')
+const {join} = require('node:path')
 const {setTimeout} = require('node:timers/promises')
 
 const {
@@ -7,8 +8,12 @@ const {
   _log
 } = require('./common')
 
+const {
+  STATUS
+} = require('../src/futu')
 
-test('start integrated test', async t => {
+
+test.serial('start integrated test', async t => {
   const {
     port,
     kill
@@ -76,3 +81,92 @@ test('start integrated test', async t => {
   kill()
 })
 
+
+test.serial('send verify code before init', async t => {
+  const {
+    port,
+    kill
+  } = await startServer({
+    initCount: 2
+  })
+
+  const tester = new WSTester(1, {
+    port,
+    t,
+    // checkStatus: false,
+    sendCode: false
+  })
+
+  await tester.ready()
+
+  tester.send({
+    type: 'VERIFY_CODE',
+    code: '12345'
+  })
+
+  await tester.init()
+
+  await tester.equal({
+    type: 'CONNECTED'
+  })
+
+  kill()
+})
+
+
+test.serial('auto init', async t => {
+  const {
+    port,
+    kill
+  } = await startServer({
+    env: {
+      FUTU_INIT_ON_START: 'yes'
+    }
+  })
+
+  const tester = new WSTester(1, {
+    port,
+    t
+  })
+
+  await tester.ready()
+
+  tester.send({
+    type: 'STATUS'
+  })
+
+  await tester.equal({
+    type: 'STATUS',
+    status: STATUS.INIT
+  })
+
+  kill()
+})
+
+
+test.serial('spawn failed', async t => {
+  const {
+    port,
+    kill
+  } = await startServer({
+    env: {
+      FUTU_CMD: join(__dirname, 'common.js'),
+      FUTU_INIT_ON_START: 'no',
+      FUTU_SUPERVISE_PROCESS: 'no'
+    }
+  })
+
+  const tester = new WSTester(1, {
+    port,
+    t
+  })
+
+  await tester.ready()
+  await tester.init()
+
+  await tester.equal({
+    type: 'CLOSED'
+  })
+
+  kill()
+})

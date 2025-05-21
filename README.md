@@ -121,9 +121,7 @@ ws.on('open', () => {
 
 ```json
 {
-  "type": "CLOSED",
-  code,
-  signal
+  "type": "CLOSED"
 }
 ```
 

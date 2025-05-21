@@ -41,7 +41,7 @@ class WSTester {
     t,
     onRequestCode,
     onConnected,
-    checkStatus = true,
+    checkStatus = STATUS.ORIGIN,
     sendCode = true,
     firstMessageType
   }) {
@@ -75,6 +75,16 @@ class WSTester {
     })
   }
 
+  async equal (...args) {
+    const data = await this._getter.get()
+
+    this._t.deepEqual(data, ...args)
+  }
+
+  reset () {
+    this._getter.reset()
+  }
+
   _log (...msg) {
     _log(`[${this._n}]`, ...msg)
   }
@@ -88,14 +98,14 @@ class WSTester {
   }
 
   async init () {
-    if (this._checkStatus) {
+    if (typeof this._checkStatus === 'number') {
       this.send({
         type: 'STATUS'
       })
 
-      this._t.deepEqual(await this._getter.get(), {
+      await this.equal({
         type: 'STATUS',
-        status: STATUS.ORIGIN
+        status: this._checkStatus
       })
     }
 
@@ -113,7 +123,7 @@ class WSTester {
         || this._firstMessageType === 'REQUEST_CODE'
         || n > 1
       ) {
-        this._t.deepEqual(await this._getter.get(), {
+        await this.equal({
           type: 'REQUEST_CODE'
         }, `REQUEST_CODE ${this._n}.${n}`)
       }
@@ -136,7 +146,7 @@ class WSTester {
         || this._firstMessageType === 'REQUEST_CODE'
         || n > 1
       ) {
-        this._t.deepEqual(await this._getter.get(), {
+        await this.equal({
           type: 'CONNECTED'
         }, `CONNECTED ${this._n}.${n}`)
       }
@@ -151,7 +161,7 @@ class WSTester {
 
     this._log('closed 1 ...')
 
-    this._t.deepEqual(await this._getter.get(), {
+    await this.equal({
       type: 'CLOSED'
     }, `CLOSED ${this._n}.1`)
 
@@ -159,7 +169,7 @@ class WSTester {
 
     this._log('closed 2 ...')
 
-    this._t.deepEqual(await this._getter.get(), {
+    await this.equal({
       type: 'CLOSED'
     }, `CLOSED ${this._n}.2`)
 
@@ -168,26 +178,30 @@ class WSTester {
 }
 
 
-const startServer = async () => {
+const startServer = async ({
+  // Set the initial count of futuopend.json
+  initCount = 0,
+  env = {}
+} = {}) => {
   const storePath = join(__dirname, 'fixtures/futuopend.json')
 
-  try {
-    fs.unlinkSync(storePath)
-  } catch (error) {
-    // do nothing
-  }
+  fs.writeFileSync(storePath, JSON.stringify({
+    count: initCount
+  }, null, 2))
 
   const [p1, port] = await findFreePorts(2)
 
-  process.env.FUTU_CMD = join(__dirname, 'fixtures/futuopend.js')
-  process.env.FUTU_LOGIN_ACCOUNT = 'test'
-  process.env.FUTU_LOGIN_PWD_MD5 = 'test'
-  process.env.FUTU_LANG = 'en'
-  process.env.FUTU_LOG_LEVEL = 'info'
-  process.env.FUTU_PORT = p1
-  process.env.SERVER_PORT = port
-  process.env.FUTU_INIT_ON_START = 'no'
-  process.env.FUTU_SUPERVISE_PROCESS = 'yes'
+  Object.assign(process.env, {
+    FUTU_CMD: join(__dirname, 'fixtures/futuopend.js'),
+    FUTU_LOGIN_ACCOUNT: 'test',
+    FUTU_LOGIN_PWD_MD5: 'test',
+    FUTU_LANG: 'en',
+    FUTU_LOG_LEVEL: 'info',
+    FUTU_PORT: p1,
+    SERVER_PORT: port,
+    FUTU_INIT_ON_START: 'no',
+    FUTU_SUPERVISE_PROCESS: 'yes'
+  }, env)
 
   const {
     promise: spawnPromise,

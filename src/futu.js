@@ -189,6 +189,11 @@ class FutuManager {
 
   // Send msg to specific clients or all clients
   _send (msg, clients) {
+    if (msg.type === 'REQUEST_CODE' && this._code) {
+      // Already has a code
+      return
+    }
+
     (clients || this._clients).forEach(client => {
       client.send(JSON.stringify(msg))
     })
@@ -198,7 +203,7 @@ class FutuManager {
     this._code = code
 
     if (this._status === STATUS.REQUESTING_VERIFICATION_CODE) {
-      this._set_verify_code(code)
+      this._set_verify_code()
       return
     }
 
@@ -208,11 +213,14 @@ class FutuManager {
     }
 
     this._ready_to_receive_code.then(() => {
-      this._set_verify_code(code)
+      this._set_verify_code()
     })
   }
 
-  _set_verify_code (code) {
+  _set_verify_code () {
+    const code = this._code
+    this._code = undefined
+
     // this._ready.then might be called multiple times,
     //   so we need to test the current status again
     if (this._status !== STATUS.REQUESTING_VERIFICATION_CODE) {
@@ -220,7 +228,7 @@ class FutuManager {
     }
 
     this._status = STATUS.VERIFIYING_CODE
-    this._child.write(`input_phone_verify_code -code=${code}\r`)
+    this._child.write(`input_phone_verify_code -code=${this._code}\r`)
   }
 }
 

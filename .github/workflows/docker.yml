@@ -50,7 +50,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ostai/futuopend:8.8.4818
+            ostai/futuopend:9.2.5208
             ostai/futuopend:latest
           platforms: linux/amd64
           cache-from: type=local,src=/tmp/.buildx-cache
