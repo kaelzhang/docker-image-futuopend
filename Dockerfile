@@ -79,7 +79,7 @@ RUN apt-get update \
 && rm -rf /var/lib/apt/lists/* \
 && apt-get clean
 
-ARG FUTU_VERSION=8.8.4818_Ubuntu16.04
+ARG FUTU_VERSION=9.2.5208_Ubuntu16.04
 
 RUN wget -O Futu_OpenD.tar.gz https://softwaredownload.futunn.com/Futu_OpenD_$FUTU_VERSION.tar.gz \
 && tar -xf Futu_OpenD.tar.gz --strip-components=1 \
