@@ -11,6 +11,8 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    env:
+      FUTU_VERSION: 9.2.5208
 
     steps:
       # Checkout the repository
@@ -65,9 +67,11 @@ jobs:
           context: .
           push: true
           tags: |
-            ostai/futuopend:9.2.5208
+            ostai/futuopend:${{ env.FUTU_VERSION }}
             ostai/futuopend:latest
           platforms: linux/amd64
+          build-args: |
+            FUTU_VERSION=${{ env.FUTU_VERSION }}_Ubuntu16.04
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
       # Move cache for future builds
