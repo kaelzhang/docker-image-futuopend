@@ -4,13 +4,14 @@ on:
   push:
     branches:
       - master  # Trigger on push to the main branch
-  # pull_request:
-  #   branches:
-  #     - main
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [22.x]
+    runs-on: ${{ matrix.os }}
     env:
       FUTU_VERSION: 9.2.5208
 
