@@ -9,7 +9,12 @@ const {
   STATUS
 } = require('../src/futu')
 
+const {
+  FutuOpenDManager
+} = require('../src/client')
+
 require('./shim')
+
 
 class Getter {
   constructor () {
