@@ -2,6 +2,10 @@
 
 # Docker Image: ostai/ FutuOpenD
 
+[![Build Status](https://github.com/kaelzhang/docker-image-futuopend/actions/workflows/docker.yml/badge.svg)](https://github.com/kaelzhang/docker-image-futuopend/actions/workflows/docker.yml)
+[![Coverage](https://codecov.io/gh/kaelzhang/docker-image-futuopend/branch/master/graph/badge.svg)](https://codecov.io/gh/kaelzhang/docker-image-futuopend)
+
+
 Docker image for FutuOpenD on Ubuntu, the one that really works and could handle SMS verification requests.
 
 The container will start

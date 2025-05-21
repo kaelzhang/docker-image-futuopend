@@ -2,6 +2,9 @@
 
 # Docker Image 镜像: ostai/FutuOpenD
 
+[![Build Status](https://github.com/kaelzhang/docker-image-futuopend/actions/workflows/docker.yml/badge.svg)](https://github.com/kaelzhang/docker-image-futuopend/actions/workflows/docker.yml)
+[![Coverage](https://codecov.io/gh/kaelzhang/docker-image-futuopend/branch/master/graph/badge.svg)](https://codecov.io/gh/kaelzhang/docker-image-futuopend)
+
 真正可用的 FutuOpenD docker 镜像。
 
 之所以创建这个项目的原因，是因为我试过很多 FutuOpenD 的 docker 镜像，要么是根本无法运行起来，要么没有处理短信验证码，或者是需要我们手动 `docker exec` 到容器里面处理验证码，导致根本不能够运维。
