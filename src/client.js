@@ -1,3 +1,7 @@
+const {
+  setTimeout,
+  clearTimeout
+} = require('node:timers')
 const {WebSocket} = require('ws')
 
 const {
@@ -34,18 +38,40 @@ class Getter {
 
 class FutuOpenDManager {
   #url
+  #terminateAfterIdle
+  #timer
   #ws
   #readyPromise
   #statusPromise
   #statusResolve
 
-  constructor(url) {
+  constructor(url, {
+    terminateAfterIdle = false
+  } = {}) {
     this.#url = url
+    this.#terminateAfterIdle = terminateAfterIdle
 
     const getter = new Getter()
     this[KEY_GETTER] = getter
 
     this.#init()
+  }
+
+  #resetTimer () {
+    if (!this.#terminateAfterIdle) {
+      return
+    }
+
+    if (this.#timer) {
+      clearTimeout(this.#timer)
+    }
+
+    this.#timer = setTimeout(() => {
+      if (this.#ws) {
+        this.terminate()
+        this.#ws = null
+      }
+    }, this.#terminateAfterIdle)
   }
 
   #init () {
@@ -68,15 +94,23 @@ class FutuOpenDManager {
       }
 
       this[KEY_GETTER].set(data)
+      this.#resetTimer()
     })
+
+    this.#resetTimer()
   }
 
   async ready () {
+    if (!this.#ws) {
+      this.#init()
+    }
+
     return this.#readyPromise
   }
 
   send (msg) {
     this.#ws.send(JSON.stringify(msg))
+    this.#resetTimer()
   }
 
   // Send verification code to FutuOpenD

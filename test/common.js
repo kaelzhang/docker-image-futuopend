@@ -36,27 +36,6 @@ class WSTester extends FutuOpenDManager {
     this._checkStatus = checkStatus
     this._sendCode = sendCode
     this._firstMessageType = firstMessageType
-
-    // const ws = new WebSocket(`ws://localhost:${port}`)
-    // this._ws = ws
-
-    // const {
-    //   promise,
-    //   resolve
-    // } = Promise.withResolvers()
-    // this._openPromise = promise
-
-    // const getter = new Getter()
-    // this._getter = getter
-
-    // ws.on('message', msg => {
-    //   const data = JSON.parse(msg)
-    //   getter.set(data)
-    // })
-
-    // ws.on('open', () => {
-    //   resolve()
-    // })
   }
 
   async equal (...args) {
@@ -72,14 +51,6 @@ class WSTester extends FutuOpenDManager {
   _log (...msg) {
     _log(`[${this._n}]`, ...msg)
   }
-
-  // async ready () {
-  //   await this._openPromise
-  // }
-
-  // send (msg) {
-  //   this._ws.send(JSON.stringify(msg))
-  // }
 
   async init () {
     if (typeof this._checkStatus === 'number') {
