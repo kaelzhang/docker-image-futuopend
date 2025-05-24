@@ -7,6 +7,23 @@ const {
 
 
 class FutuManager {
+  #cmd;
+  #login_account;
+  #login_pwd_md5;
+  #lang;
+  #log_level;
+  #api_port;
+  #status;
+  #supervise;
+  #retry;
+  #should_log;
+  #ws;
+  #clients;
+  #ready_to_receive_code;
+  #resolveReadyToReceiveCode;
+  #child;
+  #code;
+
   constructor (cmd, {
     login_account,
     login_pwd_md5,
@@ -21,39 +38,40 @@ class FutuManager {
     // Whether to supervise the FutuOpenD process, and restart it if it closes
     supervise = true
   }) {
-    this._cmd = cmd
-    this._login_account = login_account
-    this._login_pwd_md5 = login_pwd_md5
-    this._lang = lang
-    this._log_level = log_level
-    this._api_port = api_port
-    this._status = STATUS.ORIGIN
-    this._supervise = supervise
+    this.#cmd = cmd
+    this.#login_account = login_account
+    this.#login_pwd_md5 = login_pwd_md5
+    this.#lang = lang
+    this.#log_level = log_level
+    this.#api_port = api_port
+    this.#status = STATUS.ORIGIN
+    this.#supervise = supervise
+    this.#retry = 0
 
-    this._should_log = log_level !== 'no'
+    this.#should_log = log_level !== 'no'
 
-    this._ws = new WebSocketServer({port: server_port}, () => {
-      this._log(`WebSocket server is listening on port ${server_port}`)
+    this.#ws = new WebSocketServer({port: server_port}, () => {
+      this.#log(`WebSocket server is listening on port ${server_port}`)
     })
 
-    this._clients = []
+    this.#clients = []
 
-    this._ws.on('connection', ws => {
-      if (this._status === STATUS.REQUESTING_VERIFICATION_CODE) {
-        this._send({
+    this.#ws.on('connection', ws => {
+      if (this.#status === STATUS.REQUESTING_VERIFICATION_CODE) {
+        this.#send({
           type: 'REQUEST_CODE'
         }, [ws])
       }
 
-      if (this._status === STATUS.CONNECTED) {
-        this._send({
+      if (this.#status === STATUS.CONNECTED) {
+        this.#send({
           type: 'CONNECTED'
         }, [ws])
       }
 
-      this._clients.push(ws)
+      this.#clients.push(ws)
       ws.on('error', err => {
-        this._error('ws error:', err)
+        this.#error('ws error:', err)
       })
 
       ws.on('message', msg => {
@@ -69,67 +87,67 @@ class FutuManager {
         }
 
         if (type === 'INIT') {
-          this._init()
+          this.#init()
           return
         }
 
         if (type === 'STATUS') {
-          this._send({
+          this.#send({
             type: 'STATUS',
-            status: this._status
+            status: this.#status
           }, [ws])
           return
         }
       })
     })
 
-    this._reset_ready_to_receive_code()
+    this.#reset_ready_to_receive_code()
 
     if (auto_init) {
-      this._init()
+      this.#init()
     }
   }
 
-  _log (...msg) {
-    if (this._should_log) {
+  #log(...msg) {
+    if (this.#should_log) {
       console.log('[INFO]', ...msg)
     }
   }
 
-  _error (...msg) {
-    if (this._should_log) {
+  #error(...msg) {
+    if (this.#should_log) {
       console.error('[ERROR]', ...msg)
     }
   }
 
-  _reset_ready_to_receive_code () {
-    this._ready_to_receive_code = new Promise((resolve, reject) => {
-      this._resolveReadyToReceiveCode = resolve
+  #reset_ready_to_receive_code() {
+    this.#ready_to_receive_code = new Promise((resolve, reject) => {
+      this.#resolveReadyToReceiveCode = resolve
     })
   }
 
-  _init () {
-    if (this._status >= STATUS.INIT) {
+  #init() {
+    if (this.#status >= STATUS.INIT) {
       // Already inited
       return
     }
 
-    this._status = STATUS.INIT
+    this.#status = STATUS.INIT
 
-    this._log('Initializing FutuOpenD with options ...', {
-      login_account: this._login_account,
+    this.#log('Initializing FutuOpenD with options ...', {
+      login_account: this.#login_account,
       login_pwd_md5: '<hidden>',
-      lang: this._lang,
-      log_level: this._log_level,
-      api_port: this._api_port
+      lang: this.#lang,
+      log_level: this.#log_level,
+      api_port: this.#api_port
     })
 
-    this._child = pty.spawn(this._cmd, [
-      `-login_account=${this._login_account}`,
-      `-login_pwd_md5=${this._login_pwd_md5}`,
-      `-lang=${this._lang}`,
-      `-log_level=${this._log_level}`,
-      `-api_port=${this._api_port}`
+    this.#child = pty.spawn(this.#cmd, [
+      `-login_account=${this.#login_account}`,
+      `-login_pwd_md5=${this.#login_pwd_md5}`,
+      `-lang=${this.#lang}`,
+      `-log_level=${this.#log_level}`,
+      `-api_port=${this.#api_port}`
     ], {
       name: 'xterm-color',
       cols: 80,
@@ -138,93 +156,93 @@ class FutuManager {
       env: process.env
     })
 
-    this._child.on('data', chunk => {
+    this.#child.on('data', chunk => {
       process.stdout.write(chunk)
 
       if (chunk.includes('req_phone_verify_code')) {
-        this._send({
+        this.#send({
           type: 'REQUEST_CODE'
         })
-        this._status = STATUS.REQUESTING_VERIFICATION_CODE
-        this._resolveReadyToReceiveCode()
+        this.#status = STATUS.REQUESTING_VERIFICATION_CODE
+        this.#resolveReadyToReceiveCode()
         return
       }
 
       if (chunk.includes('Login successful')) {
-        this._send({
+        this.#send({
           type: 'CONNECTED'
         })
-        this._status = STATUS.CONNECTED
+        this.#status = STATUS.CONNECTED
         return
       }
     })
 
-    this._child.on('error', err => {
-      this._error('FutuOpenD error:', err)
+    this.#child.on('error', err => {
+      this.#error('FutuOpenD error:', err)
     })
 
-    this._child.on('exit', (code, signal) => {
-      this._error('FutuOpenD exited')
+    this.#child.on('exit', (code, signal) => {
+      this.#error('FutuOpenD exited')
     })
 
-    this._child.on('close', () => {
-      this._log('FutuOpenD closed')
+    this.#child.on('close', () => {
+      this.#log('FutuOpenD closed')
 
-      this._status = STATUS.CLOSED
-      this._send({
+      this.#status = STATUS.CLOSED
+      this.#send({
         type: 'CLOSED'
       })
 
-      this._reset_ready_to_receive_code()
+      this.#reset_ready_to_receive_code()
 
-      if (this._supervise) {
-        this._init()
+      if (this.#supervise) {
+        this.#init()
       }
     })
   }
 
   // Send msg to specific clients or all clients
-  _send (msg, clients) {
-    if (msg.type === 'REQUEST_CODE' && this._code) {
+  #send(msg, clients) {
+    if (msg.type === 'REQUEST_CODE' && this.#code) {
       // Already has a code
       return
     }
 
-    (clients || this._clients).forEach(client => {
+    (clients || this.#clients).forEach(client => {
       client.send(JSON.stringify(msg))
     })
   }
 
-  verify_code (code) {
-    this._code = code
+  verify_code(code) {
+    this.#code = code
 
-    if (this._status === STATUS.REQUESTING_VERIFICATION_CODE) {
-      this._set_verify_code()
+    if (this.#status === STATUS.REQUESTING_VERIFICATION_CODE) {
+      this.#set_verify_code()
       return
     }
 
-    if (this._status === STATUS.CONNECTED) {
+    if (this.#status === STATUS.CONNECTED) {
       // Already connected, no need to verify code
       return
     }
 
-    this._ready_to_receive_code.then(() => {
-      this._set_verify_code()
+    this.#ready_to_receive_code.then(() => {
+      this.#set_verify_code()
     })
   }
 
-  _set_verify_code () {
-    const code = this._code
-    this._code = undefined
+  #set_verify_code() {
+    const code = this.#code
+    this.#code = undefined
 
-    // this._ready.then might be called multiple times,
+    // this.#ready.then might be called multiple times,
     //   so we need to test the current status again
-    if (this._status !== STATUS.REQUESTING_VERIFICATION_CODE) {
+    if (this.#status !== STATUS.REQUESTING_VERIFICATION_CODE) {
       return
     }
 
-    this._status = STATUS.VERIFIYING_CODE
-    this._child.write(`input_phone_verify_code -code=${this._code}\r`)
+    this.#status = STATUS.VERIFIYING_CODE
+    this.#child.write(`input_phone_verify_code -code=${code}\r`)
   }
 }
 
