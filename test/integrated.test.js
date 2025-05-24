@@ -76,10 +76,7 @@ test.serial('start integrated test', async t => {
 
   await Promise.all(testers)
 
-  tester1.send({
-    type: 'VERIFY_CODE',
-    code: '12345'
-  })
+  tester1.sendCode('12345')
   await setTimeout(100)
 
   kill()
@@ -97,16 +94,12 @@ test.serial('send verify code before init', async t => {
   const tester = new WSTester(1, {
     port,
     t,
-    // checkStatus: false,
     sendCode: false
   })
 
   await tester.ready()
 
-  tester.send({
-    type: 'VERIFY_CODE',
-    code: '12345'
-  })
+  tester.sendCode('12345')
 
   await tester.init()
 
@@ -130,19 +123,13 @@ test.serial('auto init', async t => {
 
   const tester = new WSTester(1, {
     port,
-    t
+    t,
+    // terminateAfterIdle: 1000
   })
 
   await tester.ready()
 
-  tester.send({
-    type: 'STATUS'
-  })
-
-  await tester.equal({
-    type: 'STATUS',
-    status: STATUS.INIT
-  })
+  t.is(await tester.status(), STATUS.INIT)
 
   kill()
 })

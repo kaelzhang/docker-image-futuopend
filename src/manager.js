@@ -85,16 +85,18 @@ class FutuOpenDManager {
     })
 
     this.#ws.on('message', (msg) => {
+      this.#resetTimer()
+
       const data = JSON.parse(msg)
 
       if (data.type === 'STATUS') {
         if (this.#statusResolve) {
           this.#statusResolve(data.status)
+          return
         }
       }
 
       this[KEY_GETTER].set(data)
-      this.#resetTimer()
     })
 
     this.#resetTimer()
@@ -108,23 +110,23 @@ class FutuOpenDManager {
     return this.#readyPromise
   }
 
-  send (msg) {
+  #send (msg) {
     this.#ws.send(JSON.stringify(msg))
     this.#resetTimer()
   }
 
-  // Send verification code to FutuOpenD
-  sendCode (code) {
-    this.send({
-      type: 'VERIFY_CODE',
-      code
+  // Initialize FutuOpenD
+  init () {
+    this.#send({
+      type: 'INIT'
     })
   }
 
-  // Initialize FutuOpenD
-  init () {
-    this.send({
-      type: 'INIT'
+  // Send verification code to FutuOpenD
+  sendCode (code) {
+    this.#send({
+      type: 'VERIFY_CODE',
+      code
     })
   }
 
@@ -136,7 +138,7 @@ class FutuOpenDManager {
       this.#statusPromise = promise
       this.#statusResolve = resolve
 
-      this.send({
+      this.#send({
         type: 'STATUS'
       })
     }

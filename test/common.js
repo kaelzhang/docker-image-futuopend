@@ -26,7 +26,8 @@ class WSTester extends FutuOpenDManager {
     onConnected,
     checkStatus = STATUS.ORIGIN,
     sendCode = true,
-    firstMessageType
+    firstMessageType,
+    ...options
   }) {
     super(`ws://localhost:${port}`)
 
@@ -55,14 +56,7 @@ class WSTester extends FutuOpenDManager {
 
   async init () {
     if (typeof this._checkStatus === 'number') {
-      this.send({
-        type: 'STATUS'
-      })
-
-      await this.equal({
-        type: 'STATUS',
-        status: this._checkStatus
-      })
+      this._t.is(await this.status(), this._checkStatus)
     }
 
     super.init()
@@ -88,10 +82,7 @@ class WSTester extends FutuOpenDManager {
       }
 
       if (this._sendCode) {
-        this.send({
-          type: 'VERIFY_CODE',
-          code: '12345'
-        })
+        this.sendCode('12345')
       }
 
       if (

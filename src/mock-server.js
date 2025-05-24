@@ -7,7 +7,7 @@ const startMockServer = async ({
   // Set the initial count of futuopend.json
   initRetry = 0,
   env: optionEnv = {}
-} = {}) => {
+}) => {
   if (initRetry) {
     optionEnv.FUTU_RETRY = initRetry
   }
@@ -41,14 +41,6 @@ const startMockServer = async ({
   })
 
   let spawnOutput = ''
-
-  child.on('error', error => {
-    log('spawn error', error.stack)
-  })
-
-  child.stderr.on('data', data => {
-    log('stderr', data.toString())
-  })
 
   child.stdout.on('data', data => {
     const content = data.toString()
