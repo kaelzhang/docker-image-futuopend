@@ -1,5 +1,6 @@
 const {join} = require('node:path')
 const {spawn} = require('node:child_process')
+const log = require('node:util').debuglog('futuopend')
 
 const startMockServer = async ({
   port,
@@ -8,7 +9,7 @@ const startMockServer = async ({
   env: optionEnv = {}
 } = {}) => {
   if (initRetry) {
-    env.FUTU_RETRY = initRetry
+    optionEnv.FUTU_RETRY = initRetry
   }
 
   const env = Object.assign({
@@ -29,17 +30,29 @@ const startMockServer = async ({
     resolve: spawnResolve
   } = Promise.withResolvers()
 
-  const child = spawn(join(__dirname, '..', 'src', 'start.js'), {
+  const spawnPath = join(__dirname, 'start.js')
+
+  log('spawn', spawnPath, 'with env', env)
+
+  const child = spawn(spawnPath, {
     stdio: 'pipe',
     env
   })
 
   let spawnOutput = ''
 
+  child.on('error', error => {
+    log('spawn error', error.stack)
+  })
+
+  child.stderr.on('data', data => {
+    log('stderr', data.toString())
+  })
+
   child.stdout.on('data', data => {
     const content = data.toString()
 
-    _log('data:', content)
+    log('stdout:', content)
     spawnOutput += content
 
     if (spawnOutput.includes('listening')) {

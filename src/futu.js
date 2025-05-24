@@ -142,6 +142,11 @@ class FutuManager {
       api_port: this.#api_port
     })
 
+    console.log('spawn', this.#cmd, {
+      ...process.env,
+      FUTU_RETRY: this.#retry
+    })
+
     this.#child = pty.spawn(this.#cmd, [
       `-login_account=${this.#login_account}`,
       `-login_pwd_md5=${this.#login_pwd_md5}`,
@@ -153,9 +158,10 @@ class FutuManager {
       cols: 80,
       rows: 30,
       cwd: process.cwd(),
-      env: Object.assign({}, process.env, {
+      env: {
+        ...process.env,
         FUTU_RETRY: this.#retry
-      })
+      }
     })
 
     this.#child.on('data', chunk => {

@@ -5,7 +5,7 @@ const {setTimeout} = require('node:timers/promises')
 const {
   WSTester,
   startServer,
-  _log
+  log
 } = require('./common')
 
 const {
@@ -21,6 +21,8 @@ test.serial('start integrated test', async t => {
     kill
   } = await startServer()
 
+  log('start integrated test', port)
+
   const testers = []
 
   const {
@@ -32,7 +34,7 @@ test.serial('start integrated test', async t => {
     port,
     t,
     onRequestCode: async () => {
-      _log('onRequestCode')
+      log('onRequestCode')
 
       const tester2 = new WSTester(2, {
         port,
@@ -48,7 +50,7 @@ test.serial('start integrated test', async t => {
       testers.push(tester2.test())
     },
     onConnected: async () => {
-      _log('onConnected')
+      log('onConnected')
 
       const tester3 = new WSTester(3, {
         port,
@@ -89,7 +91,7 @@ test.serial('send verify code before init', async t => {
     port,
     kill
   } = await startServer({
-    initCount: 2
+    initRetry: 2
   })
 
   const tester = new WSTester(1, {

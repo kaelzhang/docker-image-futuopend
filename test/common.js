@@ -1,4 +1,4 @@
-const _log = require('node:util').debuglog('futuopend')
+const log = require('node:util').debuglog('futuopend')
 const findFreePorts = require('find-free-ports')
 const {WebSocket} = require('ws')
 
@@ -50,7 +50,7 @@ class WSTester extends FutuOpenDManager {
   }
 
   _log (...msg) {
-    _log(`[${this._n}]`, ...msg)
+    log(`[${this._n}]`, ...msg)
   }
 
   async init () {
@@ -132,11 +132,12 @@ class WSTester extends FutuOpenDManager {
 }
 
 
-const startServer = async () => {
+const startServer = async options => {
   const [port] = await findFreePorts(1)
 
   const kill = await startMockServer({
-    port
+    port,
+    ...options
   })
 
   return {
@@ -149,5 +150,5 @@ const startServer = async () => {
 module.exports = {
   WSTester,
   startServer,
-  _log
+  log
 }
