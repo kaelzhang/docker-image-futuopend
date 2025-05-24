@@ -6,7 +6,7 @@
     "node-pty": "^1.0.0",
     "ws": "^8.18.2"
   },
-  "main": "src/client.js",
+  "main": "src/index.js",
   "files": [
     "src/client.js",
     "src/constants.js"

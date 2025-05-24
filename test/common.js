@@ -1,9 +1,6 @@
+const _log = require('node:util').debuglog('futuopend')
 const findFreePorts = require('find-free-ports')
 const {WebSocket} = require('ws')
-const {spawn} = require('node:child_process')
-const {join} = require('node:path')
-const fs = require('node:fs')
-const _log = require('node:util').debuglog('futuopend')
 
 const {
   STATUS,
@@ -12,7 +9,11 @@ const {
 
 const {
   FutuOpenDManager
-} = require('../src/client')
+} = require('../src/manager')
+
+const {
+  startMockServer
+} = require('../src/mock-server')
 
 require('./shim')
 
@@ -131,66 +132,22 @@ class WSTester extends FutuOpenDManager {
 }
 
 
-const startServer = async ({
-  // Set the initial count of futuopend.json
-  initCount = 0,
-  env = {}
-} = {}) => {
-  const storePath = join(__dirname, 'fixtures/futuopend.json')
+const startServer = async () => {
+  const [port] = await findFreePorts(1)
 
-  fs.writeFileSync(storePath, JSON.stringify({
-    count: initCount
-  }, null, 2))
-
-  const [p1, port] = await findFreePorts(2)
-
-  Object.assign(process.env, {
-    FUTU_CMD: join(__dirname, 'fixtures/futuopend.js'),
-    FUTU_LOGIN_ACCOUNT: 'test',
-    FUTU_LOGIN_PWD_MD5: 'test',
-    FUTU_LANG: 'en',
-    FUTU_LOG_LEVEL: 'info',
-    FUTU_PORT: p1,
-    SERVER_PORT: port,
-    FUTU_INIT_ON_START: 'no',
-    FUTU_SUPERVISE_PROCESS: 'yes'
-  }, env)
-
-  const {
-    promise: spawnPromise,
-    resolve: spawnResolve
-  } = Promise.withResolvers()
-
-  const child = spawn(join(__dirname, '..', 'src', 'start.js'), {
-    stdio: 'pipe'
+  const kill = await startMockServer({
+    port
   })
-
-  let spawnOutput = ''
-
-  child.stdout.on('data', data => {
-    const content = data.toString()
-
-    _log('data:', content)
-    spawnOutput += content
-
-    if (spawnOutput.includes('listening')) {
-      spawnResolve()
-    }
-  })
-
-  await spawnPromise
 
   return {
     port,
-    kill: () => {
-      child.kill()
-    }
+    kill
   }
 }
 
 
 module.exports = {
-  startServer,
   WSTester,
+  startServer,
   _log
 }

@@ -1,4 +1,8 @@
 *
 !src
-/src/client.js
+/src/*
+!src/check.js
+!src/constants.js
+!src/futu.js
+!src/start.js
 !package*.json

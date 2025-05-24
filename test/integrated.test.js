@@ -3,14 +3,14 @@ const {join} = require('node:path')
 const {setTimeout} = require('node:timers/promises')
 
 const {
-  startServer,
   WSTester,
+  startServer,
   _log
 } = require('./common')
 
 const {
   STATUS
-} = require('../src/futu')
+} = require('..')
 
 require('./shim')
 
