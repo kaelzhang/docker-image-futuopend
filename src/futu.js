@@ -46,7 +46,11 @@ class FutuManager {
     this.#api_port = api_port
     this.#status = STATUS.ORIGIN
     this.#supervise = supervise
-    this.#retry = 0
+    this.#retry = parseInt(
+      // For testing purposes
+      process.env.FUTU_RETRY,
+      10
+    ) || 0
 
     this.#should_log = log_level !== 'no'
 

@@ -29,7 +29,7 @@ class WSTester extends FutuOpenDManager {
     firstMessageType,
     ...options
   }) {
-    super(`ws://localhost:${port}`)
+    super(`ws://localhost:${port}`, options)
 
     this._n = n
     this._t = t

@@ -116,6 +116,7 @@ test.serial('auto init', async t => {
     port,
     kill
   } = await startServer({
+    initRetry: 2,
     env: {
       FUTU_INIT_ON_START: 'yes'
     }
@@ -124,12 +125,14 @@ test.serial('auto init', async t => {
   const tester = new WSTester(1, {
     port,
     t,
-    // terminateAfterIdle: 1000
+    terminateAfterIdle: 800
   })
 
   await tester.ready()
-
   t.is(await tester.status(), STATUS.INIT)
+
+  await setTimeout(1500)
+  await tester.ready()
 
   kill()
 })
