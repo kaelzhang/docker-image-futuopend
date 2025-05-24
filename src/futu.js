@@ -142,11 +142,6 @@ class FutuManager {
       api_port: this.#api_port
     })
 
-    console.log('spawn', this.#cmd, {
-      ...process.env,
-      FUTU_RETRY: this.#retry
-    })
-
     this.#child = pty.spawn(this.#cmd, [
       `-login_account=${this.#login_account}`,
       `-login_pwd_md5=${this.#login_pwd_md5}`,

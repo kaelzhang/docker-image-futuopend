@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-console.log('start.js', process.env)
-
 const env = require('@ostai/env')
 
 const {

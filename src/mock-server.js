@@ -32,11 +32,12 @@ const startMockServer = async ({
 
   const spawnPath = join(__dirname, 'start.js')
 
-  log('spawn', spawnPath, 'with env', env)
-
   const child = spawn(spawnPath, {
     stdio: 'pipe',
-    env
+    env: {
+      ...process.env,
+      ...env
+    }
   })
 
   let spawnOutput = ''
