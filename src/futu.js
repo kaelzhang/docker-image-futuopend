@@ -153,7 +153,9 @@ class FutuManager {
       cols: 80,
       rows: 30,
       cwd: process.cwd(),
-      env: process.env
+      env: Object.assign({}, process.env, {
+        FUTU_RETRY: this.#retry
+      })
     })
 
     this.#child.on('data', chunk => {
@@ -196,6 +198,7 @@ class FutuManager {
       this.#reset_ready_to_receive_code()
 
       if (this.#supervise) {
+        this.#retry++
         this.#init()
       }
     })
