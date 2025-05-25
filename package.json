@@ -1,6 +1,6 @@
 {
   "name": "@ostai/futuopend",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "dependencies": {
     "@ostai/env": "^1.1.2",
     "node-pty": "^1.0.0",
@@ -8,8 +8,7 @@
   },
   "main": "src/index.js",
   "files": [
-    "src/client.js",
-    "src/constants.js"
+    "src"
   ],
   "scripts": {
     "test": "NODE_DEBUG=futuopend NODE_OPTIONS=--trace-warnings nyc ava --timeout=10s --verbose",
