@@ -5,7 +5,7 @@ const {WebSocket} = require('ws')
 const {
   STATUS,
   KEY_GETTER
-} = require('../src/constants')
+} = require('../src/common')
 
 const {
   FutuOpenDManager

@@ -2,6 +2,10 @@ const {join} = require('node:path')
 const {spawn} = require('node:child_process')
 const log = require('node:util').debuglog('futuopend')
 
+const {
+  OutputManager
+} = require('./common')
+
 const startMockServer = async ({
   port,
   // Set the initial count of futuopend.json
@@ -40,15 +44,13 @@ const startMockServer = async ({
     }
   })
 
-  let spawnOutput = ''
+  const output = new OutputManager()
 
   child.stdout.on('data', data => {
     const content = data.toString()
+    output.add(content)
 
-    log('stdout:', content)
-    spawnOutput += content
-
-    if (spawnOutput.includes('listening')) {
+    if (output.includes('listening')) {
       spawnResolve()
     }
   })

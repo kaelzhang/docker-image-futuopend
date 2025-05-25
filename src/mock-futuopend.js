@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const readline = require('readline')
 
 const count = parseInt(process.env.FUTU_RETRY || 0, 10)
 
@@ -11,30 +12,61 @@ args.forEach(arg => {
   config[key] = value
 })
 
-// Simulate startup delay
-setTimeout(() => {
-  // Output the verification code request message
-  console.log('req_phone_verify_code')
+// Create readline interface
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+})
 
-  // Listen for input from pty
-  process.stdin.on('data', (data) => {
-    const input = data.toString().trim()
+const ask = () => {
+  rl.question('>', (input) => {
+    const trimmed = input.trim()
 
     // Check if it's a verification code input
-    if (input.startsWith('input_phone_verify_code -code=')) {
-      const code = input.split('=')[1]
+    if (trimmed.startsWith('input_phone_verify_code -code=')) {
+      const code = trimmed.split('=')[1]
 
       // Simulate processing delay
       setTimeout(() => {
-        // Output login success message
-        console.log('Login successful')
-      }, 500)
-    }
-  })
-}, 500)
+        console.log('Login successful [from mock-futuopend]')
 
+        // Close readline after successful login
+        rl.close()
+
+        // Hang for 60 seconds
+        setTimeout(() => {}, 60 * 1000)
+      }, 100)
+
+      return
+    }
+
+    // Ask for code again
+    ask()
+  })
+}
+
+// Simulate startup delay then request verification code
+setTimeout(() => {
+  console.log('req_phone_verify_code [from mock-futuopend]')
+  ask()
+}, 100)
+
+// Simulate exit if count is less than 2
 if (count < 2) {
   setTimeout(() => {
+    rl.close()
     process.exit(3)
   }, 1200)
 }
+
+
+// // Handle process termination
+// process.on('SIGTERM', () => {
+//   rl.close()
+//   process.exit(0)
+// })
+
+// process.on('SIGINT', () => {
+//   rl.close()
+//   process.exit(0)
+// })

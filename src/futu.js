@@ -2,27 +2,29 @@ const {WebSocketServer} = require('ws')
 const pty = require('node-pty')
 
 const {
-  STATUS
-} = require('./constants')
+  STATUS,
+  OutputManager
+} = require('./common')
 
 
 class FutuManager {
-  #cmd;
-  #login_account;
-  #login_pwd_md5;
-  #lang;
-  #log_level;
-  #api_port;
-  #status;
-  #supervise;
-  #retry;
-  #should_log;
-  #ws;
-  #clients;
-  #ready_to_receive_code;
-  #resolveReadyToReceiveCode;
-  #child;
-  #code;
+  #cmd
+  #login_account
+  #login_pwd_md5
+  #lang
+  #log_level
+  #api_port
+  #status
+  #supervise
+  #retry
+  #should_log
+  #ws
+  #clients
+  #ready_to_receive_code
+  #resolveReadyToReceiveCode
+  #child
+  #code
+  #output
 
   constructor (cmd, {
     login_account,
@@ -163,10 +165,13 @@ class FutuManager {
       }
     })
 
+    this.#output = new OutputManager()
+
     this.#child.on('data', chunk => {
       process.stdout.write(chunk)
+      this.#output.add(chunk)
 
-      if (chunk.includes('req_phone_verify_code')) {
+      if (this.#output.includes('req_phone_verify_code')) {
         this.#send({
           type: 'REQUEST_CODE'
         })
@@ -175,12 +180,12 @@ class FutuManager {
         return
       }
 
-      if (chunk.includes('Login successful')) {
+      if (this.#output.includes('Login successful')) {
         this.#send({
           type: 'CONNECTED'
         })
         this.#status = STATUS.CONNECTED
-        return
+        this.#output.close()
       }
     })
 

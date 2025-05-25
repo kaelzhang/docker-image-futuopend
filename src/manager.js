@@ -7,7 +7,7 @@ const {WebSocket} = require('ws')
 const {
   STATUS,
   KEY_GETTER
-} = require('./constants')
+} = require('./common')
 
 
 class Getter {
@@ -149,9 +149,9 @@ class FutuOpenDManager {
     return status
   }
 
-  close (...args) {
-    this.#ws.close(...args)
-  }
+  // close (...args) {
+  //   this.#ws.close(...args)
+  // }
 
   terminate () {
     this.#ws.terminate()
